@@ -63,11 +63,12 @@ struct MatchMarkersPreview: View {
     let matches: [Match]
     var body: some View {
         HStack {
-            ForEach(1...5, id: \.self) {_ in
+            ForEach(1...matches.count, id: \.self) {_ in
                 RoundedRectangle(cornerRadius: 10)
                     .aspectRatio(1, contentMode: .fit)
             }
             MatchMarkers(matches: matches)
         }
+        .frame(maxHeight: 40)
     }
 }
