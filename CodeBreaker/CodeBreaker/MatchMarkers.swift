@@ -38,5 +38,23 @@ struct MatchMarkers: View {
 }
 
 #Preview {
-    MatchMarkers(matches: [.exact, .inexact, .nomatch, .exact])
+    VStack {
+        Spacer()
+        ForEach(1...9, id: \.self) {_ in
+            MatchMarkersPreview()
+            Spacer()
+        }
+    }
+    .padding()
+}
+
+struct MatchMarkersPreview: View {
+    var body: some View {
+        HStack {
+            ForEach(1...5, id: \.self) {_ in
+                Circle()
+            }
+            MatchMarkers(matches: [.exact, .inexact, .nomatch, .exact])
+        }
+    }
 }
