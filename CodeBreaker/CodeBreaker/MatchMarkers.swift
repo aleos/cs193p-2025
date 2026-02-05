@@ -38,10 +38,21 @@ struct MatchMarkers: View {
 }
 
 #Preview {
-    VStack {
+    let configurations: [[Match]] = [
+        [.exact, .inexact, .inexact],
+        [.exact, .nomatch, .nomatch],
+        [.exact, .inexact, .inexact, .exact, .nomatch],
+        [.exact, .inexact, .nomatch, .exact],
+        [.exact, .inexact],
+        [.exact, .inexact, .exact, .exact],
+        [.exact, .inexact, .inexact, .exact, .exact, .inexact],
+        [.exact, .inexact, .inexact, .exact, .inexact],
+        [.exact, .inexact, .inexact],
+    ]
+    VStack(alignment: .leading) {
         Spacer()
-        ForEach(1...9, id: \.self) {_ in
-            MatchMarkersPreview()
+        ForEach(configurations, id: \.self) { matches in
+            MatchMarkersPreview(matches: matches)
             Spacer()
         }
     }
@@ -49,12 +60,14 @@ struct MatchMarkers: View {
 }
 
 struct MatchMarkersPreview: View {
+    let matches: [Match]
     var body: some View {
         HStack {
             ForEach(1...5, id: \.self) {_ in
-                Circle()
+                RoundedRectangle(cornerRadius: 10)
+                    .aspectRatio(1, contentMode: .fit)
             }
-            MatchMarkers(matches: [.exact, .inexact, .inexact, .exact, .exact])
+            MatchMarkers(matches: matches)
         }
     }
 }
