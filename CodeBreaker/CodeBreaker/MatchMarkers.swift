@@ -16,13 +16,13 @@ struct MatchMarkers: View {
     
     var body: some View {
         HStack {
-            VStack {
-                matchMarker(peg: 0)
-                matchMarker(peg: 1)
-            }
-            VStack {
-                matchMarker(peg: 2)
-                matchMarker(peg: 3)
+            ForEach(0..<(matches.count + 1)/2, id: \.self) { matchGroup in
+                VStack {
+                    let startIndex = matchGroup * 2
+                    ForEach(startIndex..<startIndex + 2, id: \.self) { index in
+                        matchMarker(peg: index)
+                    }
+                }
             }
         }
     }
@@ -54,7 +54,7 @@ struct MatchMarkersPreview: View {
             ForEach(1...5, id: \.self) {_ in
                 Circle()
             }
-            MatchMarkers(matches: [.exact, .inexact, .nomatch, .exact])
+            MatchMarkers(matches: [.exact, .inexact, .inexact, .exact, .exact])
         }
     }
 }
