@@ -12,8 +12,8 @@ Code-breaking game (Mastermind-style) developed across all 16 lectures
 ### Lectures
 - [x] 1 - Getting Started with SwiftUI
 - [x] 2 - More SwiftUI Basics
-- [ ] 3 - Model and UI; Swift Type System
-- [ ] 4 - Building CodeBreaker's Model
+- [x] 3 - Model and UI; Swift Type System
+- [x] 4 - Building CodeBreaker's Model
 - [ ] 5 - Layout; Data Flow
 - [ ] 6 - Data Flow Demonstration
 - [ ] 7 - Generics and Views; Animation
