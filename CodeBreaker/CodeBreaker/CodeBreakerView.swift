@@ -14,7 +14,12 @@ struct CodeBreakerView: View {
         VStack {
             view(for: game.masterCode)
             view(for: game.guess)
-//            view(for: game.attempts[0].pegs)
+            ForEach(game.attempts.indices, id: \.self) { index in
+                view(for: game.attempts[index])
+            }
+            Button("Guess") {
+                game.attemptGuess()
+            }
         }
         .padding()
     }
