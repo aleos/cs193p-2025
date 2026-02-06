@@ -1,5 +1,5 @@
 //
-//  ContentView.swift
+//  CodeBreakerView.swift
 //  CodeBreaker
 //
 //  Created by Alexander Ostrovsky on 31/1/2026.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ContentView: View {
+struct CodeBreakerView: View {
     let game: CodeBreaker = CodeBreaker()
     
     var body: some View {
@@ -32,5 +32,5 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
+    CodeBreakerView()
 }
