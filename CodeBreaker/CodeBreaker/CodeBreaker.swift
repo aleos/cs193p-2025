@@ -9,33 +9,40 @@ import Foundation
 
 typealias Peg = String
 
-struct CodeBreaker {
-    static var availablePegs: [[Peg]] = [
-        // Colors (classic)
-        ["red", "green", "blue", "yellow", "orange", "purple"],
-        // Faces
-        ["😀", "😂", "😍", "😎", "🤔", "😡"],
-        // Vehicles
-        ["🚗", "🚌", "🚲", "🚁", "🚀", "🚂"],
-        // Animals
-        ["🐶", "🐱", "🦊", "🐼", "🐸", "🐵"],
-        // Food
-        ["🍎", "🍔", "🍣", "🍕", "🍩", "🍇"],
-        // Sports
-        ["⚽️", "🏀", "🏈", "🎾", "🏐", "🏓"]
-    ]
+struct Theme {
+    var name: String
+    var pegs: [Peg]
     
+    static let all: [Theme] = [
+        Theme(name: "Colors (classic)", pegs: ["red", "green", "blue", "yellow", "orange", "purple"]),
+        Theme(name: "Faces", pegs: ["😀", "😂", "😍", "😎", "🤔", "😡"]),
+        Theme(name: "Vehicles", pegs: ["🚗", "🚌", "🚲", "🚁", "🚀", "🚂"]),
+        Theme(name: "Animals", pegs: ["🐶", "🐱", "🦊", "🐼", "🐸", "🐵"]),
+        Theme(name: "Food", pegs: ["🍎", "🍔", "🍣", "🍕", "🍩", "🍇"]),
+        Theme(name: "Sports", pegs: ["⚽️", "🏀", "🏈", "🎾", "🏐", "🏓"])
+    ]
+
+    static let `default` = Theme(name: "Colors (classic)", pegs: ["red", "green", "blue", "yellow", "orange", "purple"])
+
+    static func random() -> Theme {
+        all.randomElement() ?? .default
+    }
+}
+
+struct CodeBreaker {
     var masterCode: Code
     var guess: Code
     var attempts: [Code] = []
+    let selectedTheme: String
     let pegChoices: [Peg]
     
     var canAttemptGuess: Bool { !guess.pegs.isEmpty && !guess.hasMissingPegs && !attempts.contains { $0.pegs == guess.pegs } }
     
     init(numberOfPegs: Int = 4) {
         print("Number of pegs: \(numberOfPegs)")
-        let category = Self.availablePegs.randomElement() ?? ["red", "green", "blue", "yellow", "orange", "purple"]
-        self.pegChoices = Array(category.shuffled().prefix(numberOfPegs))
+        let theme = Theme.random()
+        self.selectedTheme = theme.name
+        self.pegChoices = Array(theme.pegs.shuffled().prefix(numberOfPegs))
         masterCode = Code(kind: .master, numberOfPegs: numberOfPegs)
         masterCode.randomize(from: pegChoices)
         guess = Code(kind: .guess, numberOfPegs: numberOfPegs)

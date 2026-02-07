@@ -19,26 +19,30 @@ struct CodeBreakerView: View {
 
     
     var body: some View {
-        VStack {
-            view(for: game.masterCode)
-            ScrollView {
-                view(for: game.guess)
-                ForEach(game.attempts.indices.reversed(), id: \.self) { index in
-                    view(for: game.attempts[index])
+        NavigationStack {
+            VStack {
+                view(for: game.masterCode)
+                ScrollView {
+                    view(for: game.guess)
+                    ForEach(game.attempts.indices.reversed(), id: \.self) { index in
+                        view(for: game.attempts[index])
+                    }
+                }
+                Picker("Number of pegs", selection: $selectedNumberOfPegs) {
+                    ForEach(3...6, id: \.self) {
+                        Text("^[\($0) pegs](inflect: true)")
+                    }
+                }
+                .pickerStyle(.segmented)
+                .onChange(of: selectedNumberOfPegs, restart)
+                Button("Restart") {
+                    selectedNumberOfPegs = (3...6).randomElement() ?? 4
                 }
             }
-            Picker("Number of pegs", selection: $selectedNumberOfPegs) {
-                ForEach(3...6, id: \.self) {
-                    Text("^[\($0) pegs](inflect: true)")
-                }
-            }
-            .pickerStyle(.segmented)
-            .onChange(of: selectedNumberOfPegs, restart)
-            Button("Restart") {
-                selectedNumberOfPegs = (3...6).randomElement() ?? 4
-            }
+            .padding()
+            .navigationTitle(game.selectedTheme)
+            .navigationBarTitleDisplayMode(.inline)
         }
-        .padding()
     }
     
     var guessButton: some View {
