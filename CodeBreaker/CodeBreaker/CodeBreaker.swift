@@ -93,10 +93,10 @@ struct Code {
         }
     }
     
-    var matches: [Match] {
+    var matches: [Match]? {
         switch kind {
         case .attempt(let matches): matches
-        default: Array(repeating: Match.nomatch, count: pegs.count) // FIXME: The array is only to reserve space for matches in the UI when the matches weren't displayed
+        default: nil
         }
     }
     
