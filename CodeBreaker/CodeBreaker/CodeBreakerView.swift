@@ -66,16 +66,7 @@ struct CodeBreakerView: View {
         HStack {
             ForEach(code.pegs.indices, id: \.self) { index in
                 let pegColor = Color(name: code.pegs[index])
-                RoundedRectangle(cornerRadius: 10)
-                    .foregroundStyle(pegColor ?? .clear)
-                    .contentShape(Rectangle())
-                    .aspectRatio(1, contentMode: .fit)
-                    .overlay {
-                        if code.pegs[index] == Peg.missing {
-                            RoundedRectangle(cornerRadius: 10)
-                                .strokeBorder(.gray)
-                        }
-                    }
+                PegView(peg: code.pegs[index])
                     .overlay {
                         if pegColor == nil {
                             Text(code.pegs[index])
