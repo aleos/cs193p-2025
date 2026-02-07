@@ -31,6 +31,7 @@ struct CodeBreakerView: View {
         }
         .font(.system(size: 80))
         .minimumScaleFactor(0.1)
+        .disabled(!game.canAttemptGuess)
     }
     
     func view(for code: Code) -> some View {

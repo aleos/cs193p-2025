@@ -15,6 +15,8 @@ struct CodeBreaker {
     var attempts: [Code] = []
     let pegChoices: [Peg]
     
+    var canAttemptGuess: Bool { !guess.pegs.isEmpty && !guess.hasMissingPegs && !attempts.contains { $0.pegs == guess.pegs } }
+    
     init(pegChoices: [Peg] = [.red, .green, .blue, .yellow]) {
         self.pegChoices = pegChoices
         masterCode.randomize(from: pegChoices)
@@ -22,6 +24,7 @@ struct CodeBreaker {
     }
     
     mutating func attemptGuess() {
+        guard canAttemptGuess else { return }
         var attempt = guess
         attempt.kind = .attempt(guess.match(against: masterCode))
         attempts.append(attempt)
@@ -50,6 +53,8 @@ struct Code {
         case attempt([Match])
         case unknown
     }
+    
+    var hasMissingPegs: Bool { pegs.contains { $0 == Code.missing } }
     
     mutating func randomize(from pegChoices: [Peg]) {
         for index in pegs.indices {
