@@ -27,7 +27,7 @@ extension Color {
             self = .white
         case "gray", "grey":
             self = .gray
-        case "clear":
+        case "clear", "missing":
             self = .clear
         case "brown":
             self = .brown
