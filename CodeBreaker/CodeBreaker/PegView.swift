@@ -16,14 +16,23 @@ struct PegView: View {
     let pegShape = Circle()
     
     var body: some View {
+        let pegColor = Color(name: peg)
         pegShape
-            .foregroundStyle(Color(name: peg) ?? .clear)
+            .foregroundStyle(pegColor ?? .clear)
             .contentShape(pegShape)
             .aspectRatio(1, contentMode: .fit)
             .overlay {
                 if peg == Peg.missing {
                     pegShape
                         .strokeBorder(.gray)
+                }
+            }
+            .overlay {
+                if pegColor == nil {
+                    Text(peg)
+                        .font(.system(size: 120))
+                        .minimumScaleFactor(9/120)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             }
     }

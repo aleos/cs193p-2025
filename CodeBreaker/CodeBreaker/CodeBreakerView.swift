@@ -9,15 +9,10 @@ import SwiftUI
 
 struct CodeBreakerView: View {
     // MARK: Data Owned by Me
-    @State var game = CodeBreaker()
-    
-    enum Flavor: String, CaseIterable, Identifiable {
-        case chocolate, vanilla, strawberry
-        var id: Self { self }
-    }
-
+    @State private var game = CodeBreaker()
     @State private var selectedNumberOfPegs = 4
-
+    @State private var selection = 0
+    
     // MARK: - Body
     
     var body: some View {
@@ -30,6 +25,7 @@ struct CodeBreakerView: View {
                         view(for: game.attempts[index])
                     }
                 }
+                pegChooser
                 Picker("Number of pegs", selection: $selectedNumberOfPegs) {
                     ForEach(3...6, id: \.self) {
                         Text("^[\($0) pegs](inflect: true)")
@@ -47,14 +43,27 @@ struct CodeBreakerView: View {
         }
     }
     
+    var pegChooser: some View {
+        HStack {
+            ForEach(game.pegChoices, id: \.self) { peg in
+                Button {
+                    game.setGuessPeg(peg, at: selection)
+                    selection = (selection + 1) % game.pegChoices.count
+                } label: {
+                    PegView(peg: peg)
+                }
+            }
+        }
+    }
+    
     var guessButton: some View {
         Button("Guess") {
             withAnimation {
                 game.attemptGuess()
             }
         }
-        .font(.system(size: 80))
-        .minimumScaleFactor(0.1)
+        .font(.system(size: GuessButton.maximumFontSize))
+        .minimumScaleFactor(GuessButton.scaleFactor)
         .disabled(!game.canAttemptGuess)
     }
     
@@ -67,19 +76,17 @@ struct CodeBreakerView: View {
     func view(for code: Code) -> some View {
         HStack {
             ForEach(code.pegs.indices, id: \.self) { index in
-                let pegColor = Color(name: code.pegs[index])
                 PegView(peg: code.pegs[index])
-                    .overlay {
-                        if pegColor == nil {
-                            Text(code.pegs[index])
-                                .font(.system(size: 120))
-                                .minimumScaleFactor(9/120)
-                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .padding(Selection.border)
+                    .background {
+                        if selection == index, code.kind == .guess {
+                            Selection.shape
+                                .foregroundStyle(Selection.color)
                         }
                     }
                     .onTapGesture {
                         if code.kind == .guess {
-                            game.changeGuessPeg(at: index)
+                            selection = index
                         }
                     }
             }
@@ -94,6 +101,25 @@ struct CodeBreakerView: View {
                     }
                 }
         }
+    }
+    
+    struct GuessButton {
+        static let minimumFontSize: CGFloat = 8
+        static let maximumFontSize: CGFloat = 80
+        static let scaleFactor = minimumFontSize / maximumFontSize
+    }
+    
+    struct Selection {
+        static let border: CGFloat = 5
+        static let cornerRadius: CGFloat = 10
+        static let color: Color = Color.gray(0.85)
+        static let shape = RoundedRectangle(cornerRadius: cornerRadius)
+    }
+}
+
+extension Color {
+    static func gray(_ brightness: CGFloat) -> Color {
+        .init(hue: 148/360, saturation: 0, brightness: brightness)
     }
 }
 
