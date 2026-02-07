@@ -5,12 +5,25 @@
 //  Created by Alexander Ostrovsky on 6/2/2026.
 //
 
-import SwiftUI
+import Foundation
 
-typealias Peg = Color
+typealias Peg = String
 
 struct CodeBreaker {
-    static var availablePegs: [Peg] = [.red, .green, .blue, .yellow, .orange, .purple]
+    static var availablePegs: [[Peg]] = [
+        // Colors (classic)
+        ["red", "green", "blue", "yellow", "orange", "purple"],
+        // Faces
+        ["😀", "😂", "😍", "😎", "🤔", "😡"],
+        // Vehicles
+        ["🚗", "🚌", "🚲", "🚁", "🚀", "🚂"],
+        // Animals
+        ["🐶", "🐱", "🦊", "🐼", "🐸", "🐵"],
+        // Food
+        ["🍎", "🍔", "🍣", "🍕", "🍩", "🍇"],
+        // Sports
+        ["⚽️", "🏀", "🏈", "🎾", "🏐", "🏓"]
+    ]
     
     var masterCode: Code
     var guess: Code
@@ -21,7 +34,8 @@ struct CodeBreaker {
     
     init(numberOfPegs: Int = 4) {
         print("Number of pegs: \(numberOfPegs)")
-        self.pegChoices = Array(Self.availablePegs.shuffled().prefix(numberOfPegs))
+        let category = Self.availablePegs.randomElement() ?? ["red", "green", "blue", "yellow", "orange", "purple"]
+        self.pegChoices = Array(category.shuffled().prefix(numberOfPegs))
         masterCode = Code(kind: .master, numberOfPegs: numberOfPegs)
         masterCode.randomize(from: pegChoices)
         guess = Code(kind: .guess, numberOfPegs: numberOfPegs)
@@ -50,7 +64,7 @@ struct Code {
     var kind: Kind
     var pegs: [Peg]
     
-    static let missing: Peg = .clear
+    static let missing: Peg = "clear"
     
     enum Kind: Equatable {
         case master
@@ -61,7 +75,7 @@ struct Code {
     
     var hasMissingPegs: Bool { pegs.contains { $0 == Code.missing } }
     
-    init(kind: Kind, numberOfPegs: Int = 4) {
+    init(kind: Kind, numberOfPegs: Int) {
         self.kind = kind
         self.pegs = Array(repeating: Code.missing, count: numberOfPegs)
     }
@@ -99,3 +113,4 @@ struct Code {
         return results
     }
 }
+

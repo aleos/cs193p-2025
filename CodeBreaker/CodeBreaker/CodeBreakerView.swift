@@ -61,16 +61,25 @@ struct CodeBreakerView: View {
     func view(for code: Code) -> some View {
         HStack {
             ForEach(code.pegs.indices, id: \.self) { index in
+                let pegColor = Color(name: code.pegs[index])
                 RoundedRectangle(cornerRadius: 10)
+                    .foregroundStyle(pegColor ?? .clear)
+                    .contentShape(Rectangle())
+                    .aspectRatio(1, contentMode: .fit)
                     .overlay {
                         if code.pegs[index] == Code.missing {
                             RoundedRectangle(cornerRadius: 10)
                                 .strokeBorder(.gray)
                         }
                     }
-                    .contentShape(Rectangle())
-                    .aspectRatio(1, contentMode: .fit)
-                    .foregroundStyle(code.pegs[index])
+                    .overlay {
+                        if pegColor == nil {
+                            Text(code.pegs[index])
+                                .font(.system(size: 120))
+                                .minimumScaleFactor(9/120)
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        }
+                    }
                     .onTapGesture {
                         if code.kind == .guess {
                             game.changeGuessPeg(at: index)
