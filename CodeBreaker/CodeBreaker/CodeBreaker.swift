@@ -5,23 +5,52 @@
 //  Created by Alexander Ostrovsky on 6/2/2026.
 //
 
-import SwiftUI
+import Foundation
 
-typealias Peg = Color
+typealias Peg = String
+
+struct Theme {
+    var name: String
+    var pegs: [Peg]
+    
+    static let all: [Theme] = [
+        Theme(name: "Colors (classic)", pegs: ["red", "green", "blue", "yellow", "orange", "purple"]),
+        Theme(name: "Faces", pegs: ["😀", "😂", "😍", "😎", "🤔", "😡"]),
+        Theme(name: "Vehicles", pegs: ["🚗", "🚌", "🚲", "🚁", "🚀", "🚂"]),
+        Theme(name: "Animals", pegs: ["🐶", "🐱", "🦊", "🐼", "🐸", "🐵"]),
+        Theme(name: "Food", pegs: ["🍎", "🍔", "🍣", "🍕", "🍩", "🍇"]),
+        Theme(name: "Sports", pegs: ["⚽️", "🏀", "🏈", "🎾", "🏐", "🏓"])
+    ]
+
+    static let `default` = Theme(name: "Colors (classic)", pegs: ["red", "green", "blue", "yellow", "orange", "purple"])
+
+    static func random() -> Theme {
+        all.randomElement() ?? .default
+    }
+}
 
 struct CodeBreaker {
-    var masterCode: Code = Code(kind: .master)
-    var guess: Code = Code(kind: .guess)
+    var masterCode: Code
+    var guess: Code
     var attempts: [Code] = []
+    let selectedTheme: String
     let pegChoices: [Peg]
     
-    init(pegChoices: [Peg] = [.red, .green, .blue, .yellow]) {
-        self.pegChoices = pegChoices
+    var canAttemptGuess: Bool { !guess.pegs.isEmpty && !guess.hasMissingPegs && !attempts.contains { $0.pegs == guess.pegs } }
+    
+    init(numberOfPegs: Int = 4) {
+        print("Number of pegs: \(numberOfPegs)")
+        let theme = Theme.random()
+        self.selectedTheme = theme.name
+        self.pegChoices = Array(theme.pegs.shuffled().prefix(numberOfPegs))
+        masterCode = Code(kind: .master, numberOfPegs: numberOfPegs)
         masterCode.randomize(from: pegChoices)
+        guess = Code(kind: .guess, numberOfPegs: numberOfPegs)
         print(masterCode)
     }
     
     mutating func attemptGuess() {
+        guard canAttemptGuess else { return }
         var attempt = guess
         attempt.kind = .attempt(guess.match(against: masterCode))
         attempts.append(attempt)
@@ -40,15 +69,22 @@ struct CodeBreaker {
 
 struct Code {
     var kind: Kind
-    var pegs: [Peg] = Array(repeating: Code.missing, count: 4)
+    var pegs: [Peg]
     
-    static let missing: Peg = .clear
+    static let missing: Peg = "clear"
     
     enum Kind: Equatable {
         case master
         case guess
         case attempt([Match])
         case unknown
+    }
+    
+    var hasMissingPegs: Bool { pegs.contains { $0 == Code.missing } }
+    
+    init(kind: Kind, numberOfPegs: Int) {
+        self.kind = kind
+        self.pegs = Array(repeating: Code.missing, count: numberOfPegs)
     }
     
     mutating func randomize(from pegChoices: [Peg]) {
@@ -84,3 +120,4 @@ struct Code {
         return results
     }
 }
+
