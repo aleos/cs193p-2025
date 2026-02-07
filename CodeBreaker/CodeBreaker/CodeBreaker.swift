@@ -47,10 +47,14 @@ struct CodeBreaker {
         let theme = Theme.random()
         self.selectedTheme = theme.name
         self.pegChoices = Array(theme.pegs.shuffled().prefix(numberOfPegs))
-        masterCode = Code(kind: .master, numberOfPegs: numberOfPegs)
+        masterCode = Code(kind: .master(isHidden: true), numberOfPegs: numberOfPegs)
         masterCode.randomize(from: pegChoices)
         guess = Code(kind: .guess, numberOfPegs: numberOfPegs)
         print(masterCode)
+    }
+    
+    var isOver: Bool {
+        attempts.last?.pegs == masterCode.pegs
     }
     
     mutating func attemptGuess() {
@@ -59,6 +63,9 @@ struct CodeBreaker {
         attempt.kind = .attempt(guess.match(against: masterCode))
         attempts.append(attempt)
         guess.reset()
+        if isOver {
+            masterCode.kind = .master(isHidden: false)
+        }
     }
     
     mutating func setGuessPeg(_ peg: Peg, at index: Int) {

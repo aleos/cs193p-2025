@@ -12,7 +12,7 @@ struct Code {
     var pegs: [Peg]
         
     enum Kind: Equatable {
-        case master
+        case master(isHidden: Bool)
         case guess
         case attempt([Match])
         case unknown
@@ -28,6 +28,13 @@ struct Code {
     mutating func randomize(from pegChoices: [Peg]) {
         for index in pegs.indices {
             pegs[index] = pegChoices.randomElement() ?? Peg.missing
+        }
+    }
+    
+    var isHidden: Bool {
+        switch kind {
+        case .master(let isHidden): isHidden
+        default: false
         }
     }
     
