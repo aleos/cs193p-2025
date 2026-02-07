@@ -12,6 +12,7 @@ struct PegView: View {
     let peg: Peg
     
     // MARK: - Body
+    
     var body: some View {
         RoundedRectangle(cornerRadius: 10)
             .foregroundStyle(Color(name: peg) ?? .clear)

@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct CodeBreakerView: View {
+    // MARK: Data Owned by Me
     @State var game = CodeBreaker()
     
     enum Flavor: String, CaseIterable, Identifiable {
@@ -17,6 +18,7 @@ struct CodeBreakerView: View {
 
     @State private var selectedNumberOfPegs = 4
 
+    // MARK: - Body
     
     var body: some View {
         NavigationStack {
