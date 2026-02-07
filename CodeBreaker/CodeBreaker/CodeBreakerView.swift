@@ -10,6 +10,14 @@ import SwiftUI
 struct CodeBreakerView: View {
     @State var game = CodeBreaker()
     
+    enum Flavor: String, CaseIterable, Identifiable {
+        case chocolate, vanilla, strawberry
+        var id: Self { self }
+    }
+
+    @State private var selectedNumberOfPegs = 4
+
+    
     var body: some View {
         VStack {
             view(for: game.masterCode)
@@ -19,11 +27,14 @@ struct CodeBreakerView: View {
                     view(for: game.attempts[index])
                 }
             }
-            Button("Restart") {
-                withAnimation {
-                    game = CodeBreaker()
+            Picker("Number of pegs", selection: $selectedNumberOfPegs) {
+                ForEach(3...6, id: \.self) {
+                    Text("^[\($0) pegs](inflect: true)")
                 }
             }
+            .pickerStyle(.segmented)
+            .onChange(of: selectedNumberOfPegs, restart)
+            Button("Restart", action: restart)
         }
         .padding()
     }
@@ -37,6 +48,12 @@ struct CodeBreakerView: View {
         .font(.system(size: 80))
         .minimumScaleFactor(0.1)
         .disabled(!game.canAttemptGuess)
+    }
+    
+    func restart() {
+        withAnimation {
+            game = CodeBreaker(numberOfPegs: selectedNumberOfPegs)
+        }
     }
     
     func view(for code: Code) -> some View {
