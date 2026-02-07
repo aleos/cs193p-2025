@@ -25,7 +25,10 @@ struct CodeBreakerView: View {
                         view(for: game.attempts[index])
                     }
                 }
-                pegChooser
+                PegChooser(choices: game.pegChoices) {
+                    game.setGuessPeg($0, at: selection)
+                    selection = (selection + 1) % game.pegChoices.count
+                }
                 Picker("Number of pegs", selection: $selectedNumberOfPegs) {
                     ForEach(3...6, id: \.self) {
                         Text("^[\($0) pegs](inflect: true)")
@@ -40,19 +43,6 @@ struct CodeBreakerView: View {
             .padding()
             .navigationTitle(game.selectedTheme)
             .navigationBarTitleDisplayMode(.inline)
-        }
-    }
-    
-    var pegChooser: some View {
-        HStack {
-            ForEach(game.pegChoices, id: \.self) { peg in
-                Button {
-                    game.setGuessPeg(peg, at: selection)
-                    selection = (selection + 1) % game.pegChoices.count
-                } label: {
-                    PegView(peg: peg)
-                }
-            }
         }
     }
     
