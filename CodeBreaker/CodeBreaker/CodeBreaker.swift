@@ -62,7 +62,7 @@ struct CodeBreaker {
             let newPeg = pegChoices[(indexOfExistingPegInPegChoices + 1) % pegChoices.count]
             guess.pegs[index] = newPeg
         } else {
-            guess.pegs[index] = pegChoices.first ?? Code.missing
+            guess.pegs[index] = pegChoices.first ?? Code.missingPeg
         }
     }
 }
@@ -71,7 +71,7 @@ struct Code {
     var kind: Kind
     var pegs: [Peg]
     
-    static let missing: Peg = "clear"
+    static let missingPeg: Peg = "clear"
     
     enum Kind: Equatable {
         case master
@@ -80,16 +80,16 @@ struct Code {
         case unknown
     }
     
-    var hasMissingPegs: Bool { pegs.contains { $0 == Code.missing } }
+    var hasMissingPegs: Bool { pegs.contains { $0 == Code.missingPeg } }
     
     init(kind: Kind, numberOfPegs: Int) {
         self.kind = kind
-        self.pegs = Array(repeating: Code.missing, count: numberOfPegs)
+        self.pegs = Array(repeating: Code.missingPeg, count: numberOfPegs)
     }
     
     mutating func randomize(from pegChoices: [Peg]) {
         for index in pegs.indices {
-            pegs[index] = pegChoices.randomElement() ?? Code.missing
+            pegs[index] = pegChoices.randomElement() ?? Code.missingPeg
         }
     }
     

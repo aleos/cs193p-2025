@@ -71,7 +71,7 @@ struct CodeBreakerView: View {
                     .contentShape(Rectangle())
                     .aspectRatio(1, contentMode: .fit)
                     .overlay {
-                        if code.pegs[index] == Code.missing {
+                        if code.pegs[index] == Code.missingPeg {
                             RoundedRectangle(cornerRadius: 10)
                                 .strokeBorder(.gray)
                         }
