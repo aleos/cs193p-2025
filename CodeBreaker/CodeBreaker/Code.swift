@@ -31,6 +31,10 @@ struct Code {
         }
     }
     
+    mutating func reset() {
+        pegs = Array(repeating: Peg.missing, count: pegs.count)
+    }
+    
     var matches: [Match]? {
         switch kind {
         case .attempt(let matches): matches
