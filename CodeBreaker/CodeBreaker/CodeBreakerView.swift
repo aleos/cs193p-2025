@@ -34,7 +34,9 @@ struct CodeBreakerView: View {
             }
             .pickerStyle(.segmented)
             .onChange(of: selectedNumberOfPegs, restart)
-            Button("Restart", action: restart)
+            Button("Restart") {
+                selectedNumberOfPegs = (3...6).randomElement() ?? 4
+            }
         }
         .padding()
     }
