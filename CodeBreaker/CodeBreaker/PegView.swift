@@ -22,12 +22,6 @@ struct PegView: View {
             .contentShape(pegShape)
             .aspectRatio(1, contentMode: .fit)
             .overlay {
-                if peg == Peg.missing {
-                    pegShape
-                        .strokeBorder(.gray)
-                }
-            }
-            .overlay {
                 if pegColor == nil {
                     Text(peg)
                         .font(.system(size: 120))
