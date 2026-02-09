@@ -42,8 +42,10 @@ struct CodeBreakerView: View {
                     restart(numberOfPegs: selectedNumberOfPegs)
                 }
                 Button("Restart") {
-                    game.restart()
-                    selection = 0
+                    withAnimation(.restart) {
+                        game.restart()
+                        selection = 0
+                    }
                 }
             }
             .padding()
@@ -81,7 +83,9 @@ struct CodeBreakerView: View {
 }
 
 extension Animation {
-    static let guess = Animation.easeInOut(duration: 3)
+    static let codeBreaker = Animation.easeInOut(duration: 3)
+    static let guess = Animation.codeBreaker
+    static let restart = Animation.codeBreaker
 }
 
 extension Color {
