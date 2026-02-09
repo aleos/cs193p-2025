@@ -14,10 +14,10 @@ Code-breaking game (Mastermind-style) developed across all 16 lectures
 - [x] 2 - More SwiftUI Basics
 - [x] 3 - Model and UI; Swift Type System
 - [x] 4 - Building CodeBreaker's Model
-- [ ] 5 - Layout; Data Flow
-- [ ] 6 - Data Flow Demonstration
-- [ ] 7 - Generics and Views; Animation
-- [ ] 8 - Animation Demonstration
+- [x] 5 - Layout; Data Flow
+- [x] 6 - Data Flow Demonstration
+- [x] 7 - Generics and Views; Animation
+- [x] 8 - Animation Demonstration
 - [ ] 9 - Elapsed Time; Protocols
 - [ ] 10 - List and Navigation
 - [ ] 11 - iPad; Sheets
@@ -29,7 +29,7 @@ Code-breaking game (Mastermind-style) developed across all 16 lectures
 
 ### Assignments
 - [x] Assignment 1
-- [ ] Assignment 2
+- [x] Assignment 2
 - [ ] Assignment 3
 - [ ] Assignment 4
 - [ ] Assignment 5

@@ -34,27 +34,31 @@ struct Theme {
 }
 
 struct CodeBreaker {
-    var masterCode: Code
-    var guess: Code
+    var masterCode: Code = .init(kind: .master(isHidden: true), numberOfPegs: 4)
+    var guess: Code = .init(kind: .guess, numberOfPegs: 4)
     var attempts: [Code] = []
-    let selectedTheme: String
-    let pegChoices: [Peg]
+    private(set) var selectedTheme = ""
+    private(set) var pegChoices: [Peg] = []
     
     var canAttemptGuess: Bool { !guess.pegs.isEmpty && !guess.hasMissingPegs && !attempts.contains { $0.pegs == guess.pegs } }
     
-    init(numberOfPegs: Int = 4) {
-        print("Number of pegs: \(numberOfPegs)")
+    init() {
+        restart()
+    }
+    
+    var isOver: Bool {
+        attempts.last?.pegs == masterCode.pegs
+    }
+    
+    mutating func restart(numberOfPegs: Int? = nil) {
+        let numberOfPegs = numberOfPegs ?? masterCode.pegs.count
         let theme = Theme.random()
         self.selectedTheme = theme.name
         self.pegChoices = Array(theme.pegs.shuffled().prefix(numberOfPegs))
         masterCode = Code(kind: .master(isHidden: true), numberOfPegs: numberOfPegs)
         masterCode.randomize(from: pegChoices)
         guess = Code(kind: .guess, numberOfPegs: numberOfPegs)
-        print(masterCode)
-    }
-    
-    var isOver: Bool {
-        attempts.last?.pegs == masterCode.pegs
+        attempts.removeAll()
     }
     
     mutating func attemptGuess() {
