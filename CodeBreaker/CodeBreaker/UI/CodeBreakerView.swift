@@ -12,6 +12,8 @@ struct CodeBreakerView: View {
     @State private var game = CodeBreaker()
     @State private var selection = 0
     @State private var selectedNumberOfPegs = 4
+    @State private var restarting = false
+    @State private var hideMostRecentMarkers = false
     
     // MARK: - Body
     
@@ -20,15 +22,19 @@ struct CodeBreakerView: View {
             VStack {
                 CodeView(code: game.masterCode)
                 ScrollView {
-                    if !game.isOver {
+                    if !game.isOver || restarting {
                         CodeView(code: game.guess, selection: $selection) { guessButton }
+                            .animation(nil, value: game.attempts.count)
+                            .opacity(restarting ? 0 : 1)
                     }
                     ForEach(game.attempts.indices.reversed(), id: \.self) { index in
                         CodeView(code: game.attempts[index]) {
-                            if let matches = game.attempts[index].matches {
+                            let showMarkers = !hideMostRecentMarkers || index != game.attempts.indices.last
+                            if showMarkers, let matches = game.attempts[index].matches {
                                 MatchMarkers(matches: matches)
                             }
                         }
+                        .transition(.attempt(game.isOver))
                     }
                 }
                 if !game.isOver {
@@ -49,8 +55,13 @@ struct CodeBreakerView: View {
             .toolbar {
                 Button("Restart") {
                     withAnimation(.restart) {
-                        game.restart()
-                        selection = 0
+                        restarting = true
+                    } completion: {
+                        withAnimation(.restart) {
+                            game.restart()
+                            selection = 0
+                            restarting = false
+                        }
                     }
                 }
             }
@@ -69,6 +80,11 @@ struct CodeBreakerView: View {
             withAnimation(.guess) {
                 game.attemptGuess()
                 selection = 0
+                hideMostRecentMarkers = true
+            } completion: {
+                withAnimation(.guess) {
+                    hideMostRecentMarkers = false
+                }
             }
         }
         .font(.system(size: GuessButton.maximumFontSize))
@@ -95,6 +111,9 @@ extension Animation {
 
 extension AnyTransition {
     static let pegChooser = AnyTransition.offset(y: 200)
+    static func attempt(_ isOver: Bool) -> AnyTransition {
+        AnyTransition.asymmetric(insertion: isOver ? .opacity : .move(edge: .top), removal: .move(edge: .trailing))
+    }
 }
 
 extension Color {
