@@ -31,10 +31,7 @@ struct CodeBreakerView: View {
                         }
                     }
                 }
-                PegChooser(choices: game.pegChoices) {
-                    game.setGuessPeg($0, at: selection)
-                    selection = (selection + 1) % game.pegChoices.count
-                }
+                PegChooser(choices: game.pegChoices, onChoose: changePegAtSelection)
                 Picker("Number of pegs", selection: $selectedNumberOfPegs) {
                     ForEach(3...6, id: \.self) {
                         Text("^[\($0) pegs](inflect: true)")
@@ -50,6 +47,11 @@ struct CodeBreakerView: View {
             .navigationTitle(game.selectedTheme)
             .navigationBarTitleDisplayMode(.inline)
         }
+    }
+    
+    func changePegAtSelection(to peg: Peg) {
+        game.setGuessPeg(peg, at: selection)
+        selection = (selection + 1) % game.pegChoices.count
     }
     
     var guessButton: some View {
