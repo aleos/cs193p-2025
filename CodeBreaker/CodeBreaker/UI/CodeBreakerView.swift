@@ -31,7 +31,10 @@ struct CodeBreakerView: View {
                         }
                     }
                 }
-                PegChooser(choices: game.pegChoices, onChoose: changePegAtSelection)
+                if !game.isOver {
+                    PegChooser(choices: game.pegChoices, onChoose: changePegAtSelection)
+                        .transition(.pegChooser)
+                }
                 Picker("Number of pegs", selection: $selectedNumberOfPegs) {
                     ForEach(3...6, id: \.self) {
                         Text("^[\($0) pegs](inflect: true)")
@@ -41,6 +44,9 @@ struct CodeBreakerView: View {
                 .onChange(of: selectedNumberOfPegs) {
                     restart(numberOfPegs: selectedNumberOfPegs)
                 }
+            }
+            .padding()
+            .toolbar {
                 Button("Restart") {
                     withAnimation(.restart) {
                         game.restart()
@@ -48,7 +54,6 @@ struct CodeBreakerView: View {
                     }
                 }
             }
-            .padding()
             .navigationTitle(game.selectedTheme)
             .navigationBarTitleDisplayMode(.inline)
         }
@@ -86,6 +91,10 @@ extension Animation {
     static let codeBreaker = Animation.easeInOut(duration: 3)
     static let guess = Animation.codeBreaker
     static let restart = Animation.codeBreaker
+}
+
+extension AnyTransition {
+    static let pegChooser = AnyTransition.offset(y: 200)
 }
 
 extension Color {
