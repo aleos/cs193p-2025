@@ -10,8 +10,8 @@ import SwiftUI
 struct CodeBreakerView: View {
     // MARK: Data Owned by Me
     @State private var game = CodeBreaker()
-    @State private var selectedNumberOfPegs = 4
     @State private var selection = 0
+    @State private var selectedNumberOfPegs = 4
     
     // MARK: - Body
     
@@ -38,9 +38,12 @@ struct CodeBreakerView: View {
                     }
                 }
                 .pickerStyle(.segmented)
-                .onChange(of: selectedNumberOfPegs, restart)
+                .onChange(of: selectedNumberOfPegs) {
+                    restart(numberOfPegs: selectedNumberOfPegs)
+                }
                 Button("Restart") {
-                    selectedNumberOfPegs = (3...6).randomElement() ?? 4
+                    game.restart()
+                    selection = 0
                 }
             }
             .padding()
@@ -66,10 +69,8 @@ struct CodeBreakerView: View {
         .disabled(!game.canAttemptGuess)
     }
     
-    func restart() {
-        withAnimation {
-            game = CodeBreaker(numberOfPegs: selectedNumberOfPegs)
-        }
+    func restart(numberOfPegs: Int? = nil) {
+        game.restart(numberOfPegs: numberOfPegs ?? selectedNumberOfPegs)
     }
     
     struct GuessButton {
