@@ -56,7 +56,7 @@ struct CodeBreakerView: View {
     
     var guessButton: some View {
         Button("Guess") {
-            withAnimation {
+            withAnimation(.guess) {
                 game.attemptGuess()
                 selection = 0
             }
@@ -77,6 +77,10 @@ struct CodeBreakerView: View {
         static let maximumFontSize: CGFloat = 80
         static let scaleFactor = minimumFontSize / maximumFontSize
     }
+}
+
+extension Animation {
+    static let guess = Animation.easeInOut(duration: 3)
 }
 
 extension Color {
