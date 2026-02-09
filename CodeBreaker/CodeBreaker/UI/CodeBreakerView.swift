@@ -23,9 +23,13 @@ struct CodeBreakerView: View {
                 CodeView(code: game.masterCode)
                 ScrollView {
                     if !game.isOver || restarting {
-                        CodeView(code: game.guess, selection: $selection) { guessButton }
-                            .animation(nil, value: game.attempts.count)
-                            .opacity(restarting ? 0 : 1)
+                        CodeView(code: game.guess, selection: $selection) {
+                            Button("Guess", action: guess)
+                                .flexibleSystemFont()
+                                .disabled(!game.canAttemptGuess)
+                        }
+                        .animation(nil, value: game.attempts.count)
+                        .opacity(restarting ? 0 : 1)
                     }
                     ForEach(game.attempts.indices.reversed(), id: \.self) { index in
                         CodeView(code: game.attempts[index]) {
@@ -48,21 +52,14 @@ struct CodeBreakerView: View {
                 }
                 .pickerStyle(.segmented)
                 .onChange(of: selectedNumberOfPegs) {
-                    restart(numberOfPegs: selectedNumberOfPegs)
+                    game.restart(numberOfPegs: selectedNumberOfPegs)
+                    selection = 0
                 }
             }
             .padding()
             .toolbar {
-                Button("Restart") {
-                    withAnimation(.restart) {
-                        restarting = true
-                    } completion: {
-                        withAnimation(.restart) {
-                            game.restart()
-                            selection = 0
-                            restarting = false
-                        }
-                    }
+                Button("Restart", systemImage: "arrow.circlepath") {
+                    restart()
                 }
             }
             .navigationTitle(game.selectedTheme)
@@ -75,50 +72,28 @@ struct CodeBreakerView: View {
         selection = (selection + 1) % game.pegChoices.count
     }
     
-    var guessButton: some View {
-        Button("Guess") {
+    func guess() {
+        withAnimation(.guess) {
+            game.attemptGuess()
+            selection = 0
+            hideMostRecentMarkers = true
+        } completion: {
             withAnimation(.guess) {
-                game.attemptGuess()
-                selection = 0
-                hideMostRecentMarkers = true
-            } completion: {
-                withAnimation(.guess) {
-                    hideMostRecentMarkers = false
-                }
+                hideMostRecentMarkers = false
             }
         }
-        .font(.system(size: GuessButton.maximumFontSize))
-        .minimumScaleFactor(GuessButton.scaleFactor)
-        .disabled(!game.canAttemptGuess)
     }
     
     func restart(numberOfPegs: Int? = nil) {
-        game.restart(numberOfPegs: numberOfPegs ?? selectedNumberOfPegs)
-    }
-    
-    struct GuessButton {
-        static let minimumFontSize: CGFloat = 8
-        static let maximumFontSize: CGFloat = 80
-        static let scaleFactor = minimumFontSize / maximumFontSize
-    }
-}
-
-extension Animation {
-    static let codeBreaker = Animation.easeInOut(duration: 3)
-    static let guess = Animation.codeBreaker
-    static let restart = Animation.codeBreaker
-}
-
-extension AnyTransition {
-    static let pegChooser = AnyTransition.offset(y: 200)
-    static func attempt(_ isOver: Bool) -> AnyTransition {
-        AnyTransition.asymmetric(insertion: isOver ? .opacity : .move(edge: .top), removal: .move(edge: .trailing))
-    }
-}
-
-extension Color {
-    static func gray(_ brightness: CGFloat) -> Color {
-        .init(hue: 148/360, saturation: 0, brightness: brightness)
+        withAnimation(.restart) {
+            restarting = true
+        } completion: {
+            withAnimation(.restart) {
+                game.restart(numberOfPegs: numberOfPegs ?? selectedNumberOfPegs)
+                selection = 0
+                restarting = false
+            }
+        }
     }
 }
 
