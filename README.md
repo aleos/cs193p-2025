@@ -30,7 +30,7 @@ Code-breaking game (Mastermind-style) developed across all 16 lectures
 ### Assignments
 - [x] Assignment 1
 - [x] Assignment 2
-- [ ] Assignment 3
+- [x] Assignment 3
 - [ ] Assignment 4
 - [ ] Assignment 5
 
