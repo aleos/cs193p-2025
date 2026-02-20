@@ -13,26 +13,6 @@ extension Peg {
     static let missing = ""
 }
 
-struct Theme {
-    var name: String
-    var pegs: [Peg]
-    
-    static let all: [Theme] = [
-        Theme(name: "Colors (classic)", pegs: ["red", "green", "blue", "yellow", "orange", "purple"]),
-        Theme(name: "Faces", pegs: ["😀", "😂", "😍", "😎", "🤔", "😡"]),
-        Theme(name: "Vehicles", pegs: ["🚗", "🚌", "🚲", "🚁", "🚀", "🚂"]),
-        Theme(name: "Animals", pegs: ["🐶", "🐱", "🦊", "🐼", "🐸", "🐵"]),
-        Theme(name: "Food", pegs: ["🍎", "🍔", "🍣", "🍕", "🍩", "🍇"]),
-        Theme(name: "Sports", pegs: ["⚽️", "🏀", "🏈", "🎾", "🏐", "🏓"])
-    ]
-
-    static let `default` = Theme(name: "Colors (classic)", pegs: ["red", "green", "blue", "yellow", "orange", "purple"])
-
-    static func random() -> Theme {
-        all.randomElement() ?? .default
-    }
-}
-
 struct CodeWordBreaker {
     var masterCode: Code = .init(kind: .master(isHidden: true), numberOfPegs: 4)
     var guess: Code = .init(kind: .guess, numberOfPegs: 4)
@@ -52,9 +32,10 @@ struct CodeWordBreaker {
     
     mutating func restart(numberOfPegs: Int? = nil) {
         let numberOfPegs = numberOfPegs ?? masterCode.pegs.count
-        let theme = Theme.random()
-        self.selectedTheme = theme.name
-        self.pegChoices = Array(theme.pegs.shuffled().prefix(numberOfPegs))
+        self.selectedTheme = "alphabet"
+        self.pegChoices = (UnicodeScalar("a").value...UnicodeScalar("z").value)
+            .compactMap { UnicodeScalar($0)}
+            .map { String($0) }
         masterCode = Code(kind: .master(isHidden: true), numberOfPegs: numberOfPegs)
         masterCode.randomize(from: pegChoices)
         guess = Code(kind: .guess, numberOfPegs: numberOfPegs)
