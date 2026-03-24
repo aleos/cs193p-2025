@@ -42,7 +42,7 @@ struct CodeWordBreakerView: View {
                     }
                 }
                 if !game.isOver {
-                    PegChooser(choices: game.pegChoices, onChoose: changePegAtSelection)
+                    PegKeyboard(onChoose: changePegAtSelection)
                         .transition(.pegChooser)
                 }
                 Picker("Number of pegs", selection: $selectedNumberOfPegs) {
@@ -69,7 +69,7 @@ struct CodeWordBreakerView: View {
     
     func changePegAtSelection(to peg: Peg) {
         game.setGuessPeg(peg, at: selection)
-        selection = (selection + 1) % game.pegChoices.count
+        selection = (selection + 1) % game.guess.pegs.count
     }
     
     func guess() {
