@@ -61,8 +61,11 @@ struct CodeView<AncillaryView>: View where AncillaryView: View {
                         }
                     }
             }
-            Color.clear.aspectRatio(1, contentMode: .fit)
-                .overlay { ancillaryView() }
+            let ancillary = ancillaryView()
+            if !(ancillary is EmptyView) {
+                Color.clear.aspectRatio(1, contentMode: .fit)
+                    .overlay { ancillary }
+            }
         }
     }
 }
@@ -77,4 +80,5 @@ fileprivate struct Selection {
 #Preview {
     @Previewable @State var selection: Int = 0
     CodeView(code: .init(kind: .guess, numberOfPegs: 4), selection: $selection) { Color.teal }
+    CodeView(code: .init(kind: .guess, numberOfPegs: 4), selection: $selection)
 }
