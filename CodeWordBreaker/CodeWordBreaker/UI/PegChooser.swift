@@ -13,60 +13,57 @@ struct PegChooser: View {
     
     // MARK: Data Out Function
     let onChoose: ((Peg) -> Void)?
-    
-    @State private var measuredWidth: CGFloat = 200
-        
+            
     // MARK: - Body
     
     var body: some View {
-        VStack {
-            row(for: ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"], width: measuredWidth - Key.outerPadding)
-            row(for: ["a", "s", "d", "f", "g", "h", "j", "k", "l"], width: measuredWidth - Key.outerPadding)
-            row(for: ["z", "x", "c", "v", "b", "n", "m"], width: measuredWidth - Key.outerPadding)
-        }
-        .overlay(
-            GeometryReader { proxy in
-                Color.clear
-                    .preference(key: WidthPreferenceKey.self, value: proxy.size.width)
+        // Invisible placeholder to establish the correct intrinsic size
+        VStack(spacing: Key.spacing) {
+            ForEach(0..<Key.rowCount, id: \.self) { _ in
+                pegSizeTemplate
             }
-        )
-        .onPreferenceChange(WidthPreferenceKey.self) { newWidth in
-            measuredWidth = newWidth
+        }
+        .overlay {
+            GeometryReader { geo in
+                let pegSize = (geo.size.width - Key.spacing * CGFloat(Key.maxNumber - 1)) / CGFloat(Key.maxNumber)
+                VStack(spacing: Key.spacing) {
+                    row(for: ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"], pegSize: pegSize)
+                    row(for: ["a", "s", "d", "f", "g", "h", "j", "k", "l"], pegSize: pegSize)
+                    row(for: ["z", "x", "c", "v", "b", "n", "m"], pegSize: pegSize)
+                }
+            }
         }
     }
     
-    func row(for choices: [Peg], width: CGFloat) -> some View {
-        HStack {
-            Spacer()
-            HStack(spacing: Key.spacing) {
-                ForEach(choices, id: \.self) { peg in
-                    Button {
-                        onChoose?(peg)
-                    } label: {
-                        PegView(peg: peg)
-                            .padding(Key.innerPadding)
-                            .background(RoundedRectangle(cornerRadius: 5).strokeBorder(.gray))
-                    }
-                    .frame(width: width / CGFloat(Key.maxNumber) - Key.spacing)
-                }
+    private var pegSizeTemplate: some View {
+        HStack(spacing: Key.spacing) {
+            ForEach(0..<Key.maxNumber, id: \.self) { _ in
+                Color.clear.aspectRatio(1, contentMode: .fit)
             }
-            Spacer()
+        }
+    }
+    
+    func row(for choices: [Peg], pegSize: CGFloat) -> some View {
+        HStack(spacing: Key.spacing) {
+            ForEach(choices, id: \.self) { peg in
+                Button {
+                    onChoose?(peg)
+                } label: {
+                    PegView(peg: peg)
+                        .padding(Key.innerPadding)
+                        .background(RoundedRectangle(cornerRadius: 5).strokeBorder(.gray))
+                }
+                .frame(width: pegSize, height: pegSize)
+            }
         }
     }
 }
 
 fileprivate struct Key {
-    static let outerPadding: CGFloat = 0
     static let innerPadding: CGFloat = 2
     static let spacing: CGFloat = 10
     static let maxNumber = 10
-}
-
-private struct WidthPreferenceKey: PreferenceKey {
-    static var defaultValue: CGFloat = 0
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = nextValue()
-    }
+    static let rowCount = 3
 }
 
 #Preview {
