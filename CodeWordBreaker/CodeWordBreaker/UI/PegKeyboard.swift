@@ -1,5 +1,5 @@
 //
-//  PegChooser.swift
+//  PegKeyboard.swift
 //  CodeWordBreaker
 //
 //  Created by Alexander Ostrovsky on 18/2/2026.
@@ -7,10 +7,7 @@
 
 import SwiftUI
 
-struct PegChooser: View {
-    // MARK: Data In
-    let choices: [Peg]
-    
+struct PegKeyboard: View {
     // MARK: Data Out Function
     let onChoose: ((Peg) -> Void)?
             
@@ -68,5 +65,5 @@ fileprivate struct Key {
 
 #Preview {
     @Previewable @State var selection: Int = 0
-    PegChooser(choices: ["blue", "green", "yellow"], onChoose: nil)
+    PegKeyboard(onChoose: nil)
 }
