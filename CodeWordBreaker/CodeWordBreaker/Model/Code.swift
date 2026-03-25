@@ -25,9 +25,11 @@ struct Code {
         self.pegs = Array(repeating: Peg.missing, count: numberOfPegs)
     }
     
-    mutating func randomize(from pegChoices: [Peg]) {
-        for index in pegs.indices {
-            pegs[index] = pegChoices.randomElement() ?? Peg.missing
+    mutating func randomize(from words: Words) {
+        if let newCode = words.random(length: pegs.count) {
+            pegs = newCode.map(Peg.init)
+        } else {
+            pegs = Array(repeating: Peg.missing, count: pegs.count)
         }
         print(self)
     }

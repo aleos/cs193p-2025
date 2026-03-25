@@ -18,7 +18,7 @@ struct CodeWordBreaker {
     var guess: Code = .init(kind: .guess, numberOfPegs: 4)
     var attempts: [Code] = []
     private(set) var selectedTheme = ""
-    private(set) var pegChoices: [Peg] = []
+    private let words = Words.shared
     
     var canAttemptGuess: Bool { !guess.pegs.isEmpty && !guess.hasMissingPegs && !attempts.contains { $0.pegs == guess.pegs } }
     
@@ -33,11 +33,8 @@ struct CodeWordBreaker {
     mutating func restart(numberOfPegs: Int? = nil) {
         let numberOfPegs = numberOfPegs ?? masterCode.pegs.count
         self.selectedTheme = "alphabet"
-        self.pegChoices = (UnicodeScalar("a").value...UnicodeScalar("z").value)
-            .compactMap { UnicodeScalar($0)}
-            .map { String($0) }
         masterCode = Code(kind: .master(isHidden: true), numberOfPegs: numberOfPegs)
-        masterCode.randomize(from: pegChoices)
+        masterCode.randomize(from: words)
         guess = Code(kind: .guess, numberOfPegs: numberOfPegs)
         attempts.removeAll()
     }
@@ -56,16 +53,6 @@ struct CodeWordBreaker {
     mutating func setGuessPeg(_ peg: Peg, at index: Int) {
         guard guess.pegs.indices.contains(index) else { return }
         guess.pegs[index] = peg
-    }
-    
-    mutating func changeGuessPeg(at index: Int) {
-        let existingPeg = guess.pegs[index]
-        if let indexOfExistingPegInPegChoices = pegChoices.firstIndex(of: existingPeg) {
-            let newPeg = pegChoices[(indexOfExistingPegInPegChoices + 1) % pegChoices.count]
-            guess.pegs[index] = newPeg
-        } else {
-            guess.pegs[index] = pegChoices.first ?? Peg.missing
-        }
     }
 }
 
