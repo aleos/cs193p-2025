@@ -24,9 +24,9 @@ struct PegKeyboard: View {
             GeometryReader { geo in
                 let pegSize = (geo.size.width - Key.spacing * CGFloat(Key.maxNumber - 1)) / CGFloat(Key.maxNumber)
                 VStack(spacing: Key.spacing) {
-                    row(for: ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"], pegSize: pegSize)
-                    row(for: ["a", "s", "d", "f", "g", "h", "j", "k", "l"], pegSize: pegSize)
-                    row(for: ["z", "x", "c", "v", "b", "n", "m"], pegSize: pegSize)
+                    row(for: ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"], pegSize: pegSize)
+                    row(for: ["A", "S", "D", "F", "G", "H", "J", "K", "L"], pegSize: pegSize)
+                    row(for: ["Z", "X", "C", "V", "B", "N", "M"], pegSize: pegSize)
                 }
             }
         }

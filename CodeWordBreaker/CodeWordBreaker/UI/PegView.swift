@@ -33,8 +33,11 @@ struct PegView: View {
 }
 
 #Preview {
-    PegView(peg: "teal")
-        .padding()
+    VStack {
+        PegView(peg: "teal")
+        PegView(peg: "a")
+    }
+    .padding()
 }
 
 extension Color {

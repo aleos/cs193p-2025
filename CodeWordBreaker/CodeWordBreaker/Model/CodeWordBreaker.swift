@@ -44,6 +44,7 @@ struct CodeWordBreaker {
         var attempt = guess
         attempt.kind = .attempt(guess.match(against: masterCode))
         attempts.append(attempt)
+        print("Attempt: \(attempt)")
         guess.reset()
         if isOver {
             masterCode.kind = .master(isHidden: false)

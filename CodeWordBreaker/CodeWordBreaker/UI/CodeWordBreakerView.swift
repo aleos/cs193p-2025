@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct CodeWordBreakerView: View {
+    // MARK: Data not Owned by Me
+    @Environment(\.words) var words
+    
     // MARK: Data Owned by Me
     @State private var game = CodeWordBreaker()
     @State private var selection = 0
@@ -32,12 +35,7 @@ struct CodeWordBreakerView: View {
                         .opacity(restarting ? 0 : 1)
                     }
                     ForEach(game.attempts.indices.reversed(), id: \.self) { index in
-                        CodeView(code: game.attempts[index]) {
-                            let showMarkers = !hideMostRecentMarkers || index != game.attempts.indices.last
-                            if showMarkers, let matches = game.attempts[index].matches {
-                                MatchMarkers(matches: matches)
-                            }
-                        }
+                        CodeView(code: game.attempts[index])
                         .transition(.attempt(game.isOver))
                     }
                 }
@@ -64,6 +62,11 @@ struct CodeWordBreakerView: View {
             }
             .navigationTitle(game.selectedTheme)
             .navigationBarTitleDisplayMode(.inline)
+        }
+        .onChange(of: words.count) { oldValue, newValue in
+            if oldValue == 0, newValue > 0 {
+                restart()
+            }
         }
     }
     

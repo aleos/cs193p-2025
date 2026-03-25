@@ -37,24 +37,8 @@ struct CodeView<AncillaryView>: View where AncillaryView: View {
             ForEach(code.pegs.indices, id: \.self) { index in
                 PegView(peg: code.pegs[index])
                     .padding(Selection.border)
-                    .background { // selection background
-                        Group {
-                            if selection == index, code.kind == .guess {
-                                Selection.shape
-                                    .foregroundStyle(Selection.color)
-                                    .matchedGeometryEffect(id: "selection", in: selectionNamespace)
-                            }
-                        }
-                        .animation(.selection, value: selection)
-                    }
-                    .overlay { // hidden code obscuring
-                        Selection.shape.foregroundStyle(code.isHidden ? .gray : .clear)
-                            .transaction { transaction in
-                                if code.isHidden {
-                                    transaction.animation = nil
-                                }
-                            }
-                    }
+                    .background { selectionBackground(for: index) }
+                    .overlay { hiddenCodeOverlay }
                     .onTapGesture {
                         if code.kind == .guess {
                             selection = index
@@ -67,6 +51,46 @@ struct CodeView<AncillaryView>: View where AncillaryView: View {
                     .overlay { ancillary }
             }
         }
+    }
+    
+    @ViewBuilder
+    private func selectionBackground(for index: Int) -> some View {
+        switch code.kind {
+        case .attempt(let matches):
+            Selection.shape
+                .foregroundStyle(matchColor(for: matches[index]))
+        case .guess:
+            Group {
+                if selection == index {
+                    Selection.shape
+                        .foregroundStyle(Selection.color)
+                        .matchedGeometryEffect(
+                            id: "selection",
+                            in: selectionNamespace
+                        )
+                }
+            }
+            .animation(.selection, value: selection)
+        case .master, .unknown:
+            EmptyView()
+        }
+    }
+    
+    private func matchColor(for match: Match) -> Color {
+        switch match {
+        case .exact: .green
+        case .inexact: .yellow
+        case .nomatch: .gray
+        }
+    }
+    
+    private var hiddenCodeOverlay: some View {
+        Selection.shape.foregroundStyle(code.isHidden ? .gray : .clear)
+            .transaction { transaction in
+                if code.isHidden {
+                    transaction.animation = nil
+                }
+            }
     }
 }
 
