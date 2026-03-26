@@ -10,16 +10,16 @@ import SwiftUI
 struct CodeWordBreakerView: View {
     // MARK: Data In
     @Environment(\.words) var words
-
+    
     // MARK: Data Owned by Me
     @State private var game = CodeWordBreaker()
     @State private var selection = 0
     @State private var selectedNumberOfPegs = 4
     @State private var restarting = false
     @State private var hideMostRecentMarkers = false
-
+    
     // MARK: - Body
-
+    
     var body: some View {
         NavigationStack {
             VStack {
@@ -32,7 +32,7 @@ struct CodeWordBreakerView: View {
                     }
                     ForEach(game.attempts.indices.reversed(), id: \.self) { index in
                         CodeView(code: game.attempts[index])
-                        .transition(.attempt(game.isOver))
+                            .transition(.attempt(game.isOver))
                     }
                 }
                 if !game.isOver {
@@ -44,16 +44,6 @@ struct CodeWordBreakerView: View {
                     }
                     .transition(.pegChooser)
                 }
-                Picker("Number of pegs", selection: $selectedNumberOfPegs) {
-                    ForEach(3...6, id: \.self) {
-                        Text("^[\($0) pegs](inflect: true)")
-                    }
-                }
-                .pickerStyle(.segmented)
-                .onChange(of: selectedNumberOfPegs) {
-                    game.restart(numberOfPegs: selectedNumberOfPegs)
-                    selection = 0
-                }
             }
             .padding()
             .toolbar {
@@ -61,7 +51,20 @@ struct CodeWordBreakerView: View {
                     restart()
                 }
             }
-            .navigationTitle(game.selectedTheme)
+            .navigationTitle(game.selectedTheme.capitalized)
+            .toolbar {
+                ToolbarItem(placement: .bottomBar) {
+                    Picker("Number of pegs", selection: $selectedNumberOfPegs) {
+                        ForEach(3...6, id: \.self) {
+                            Text("^[\($0) letters](inflect: true)")
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                    .onChange(of: selectedNumberOfPegs) {
+                        restart()
+                    }
+                }
+            }
             .navigationBarTitleDisplayMode(.inline)
         }
         .onChange(of: words.count) { oldValue, newValue in
@@ -70,12 +73,12 @@ struct CodeWordBreakerView: View {
             }
         }
     }
-
+    
     func changePegAtSelection(to peg: Peg) {
         game.setGuessPeg(peg, at: selection)
         selection = (selection + 1) % game.guess.pegs.count
     }
-
+    
     func guess() {
         withAnimation(.guess) {
             game.attemptGuess()
@@ -87,13 +90,13 @@ struct CodeWordBreakerView: View {
             }
         }
     }
-
-    func restart(numberOfPegs: Int? = nil) {
+    
+    func restart() {
         withAnimation(.restart) {
             restarting = true
         } completion: {
             withAnimation(.restart) {
-                game.restart(numberOfPegs: numberOfPegs ?? selectedNumberOfPegs)
+                game.restart(numberOfPegs: selectedNumberOfPegs)
                 selection = 0
                 restarting = false
             }
