@@ -8,31 +8,27 @@
 import SwiftUI
 
 struct CodeWordBreakerView: View {
-    // MARK: Data not Owned by Me
+    // MARK: Data In
     @Environment(\.words) var words
-    
+
     // MARK: Data Owned by Me
     @State private var game = CodeWordBreaker()
     @State private var selection = 0
     @State private var selectedNumberOfPegs = 4
     @State private var restarting = false
     @State private var hideMostRecentMarkers = false
-    
+
     // MARK: - Body
-    
+
     var body: some View {
         NavigationStack {
             VStack {
                 CodeView(code: game.masterCode)
                 ScrollView {
                     if !game.isOver || restarting {
-                        CodeView(code: game.guess, selection: $selection) {
-                            Button("Guess", action: guess)
-                                .flexibleSystemFont()
-                                .disabled(!game.canAttemptGuess)
-                        }
-                        .animation(nil, value: game.attempts.count)
-                        .opacity(restarting ? 0 : 1)
+                        CodeView(code: game.guess, selection: $selection)
+                            .animation(nil, value: game.attempts.count)
+                            .opacity(restarting ? 0 : 1)
                     }
                     ForEach(game.attempts.indices.reversed(), id: \.self) { index in
                         CodeView(code: game.attempts[index])
@@ -40,8 +36,13 @@ struct CodeWordBreakerView: View {
                     }
                 }
                 if !game.isOver {
-                    PegKeyboard(onChoose: changePegAtSelection)
-                        .transition(.pegChooser)
+                    Group {
+                        PegKeyboard(onChoose: changePegAtSelection)
+                        Button("Guess", action: guess)
+                            .buttonStyle(.glassProminent)
+                            .disabled(!game.canAttemptGuess)
+                    }
+                    .transition(.pegChooser)
                 }
                 Picker("Number of pegs", selection: $selectedNumberOfPegs) {
                     ForEach(3...6, id: \.self) {
@@ -69,12 +70,12 @@ struct CodeWordBreakerView: View {
             }
         }
     }
-    
+
     func changePegAtSelection(to peg: Peg) {
         game.setGuessPeg(peg, at: selection)
         selection = (selection + 1) % game.guess.pegs.count
     }
-    
+
     func guess() {
         withAnimation(.guess) {
             game.attemptGuess()
@@ -86,7 +87,7 @@ struct CodeWordBreakerView: View {
             }
         }
     }
-    
+
     func restart(numberOfPegs: Int? = nil) {
         withAnimation(.restart) {
             restarting = true
