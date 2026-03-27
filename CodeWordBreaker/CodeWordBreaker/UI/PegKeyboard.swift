@@ -10,6 +10,7 @@ import SwiftUI
 struct PegKeyboard: View {
     // MARK: Data Out Function
     let onChoose: ((Peg) -> Void)?
+    let onRemove: (() -> Void)?
     var bestResult: ((Peg) -> Match?)? = nil
             
     // MARK: - Body
@@ -27,7 +28,23 @@ struct PegKeyboard: View {
                 VStack(spacing: Key.spacing) {
                     row(for: ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"], pegSize: pegSize)
                     row(for: ["A", "S", "D", "F", "G", "H", "J", "K", "L"], pegSize: pegSize)
-                    row(for: ["Z", "X", "C", "V", "B", "N", "M"], pegSize: pegSize)
+                    HStack {
+                        Spacer()
+                        Spacer()
+                        row(for: ["Z", "X", "C", "V", "B", "N", "M"], pegSize: pegSize)
+                        Spacer()
+                        Button(action: onRemove ?? {}) {
+                            PegView(peg: "⌫")
+                                .padding(Key.innerPadding)
+                                .background(
+                                    Key.shape.strokeBorder(Key.borderColor)
+                                        .background(Key.shape.foregroundStyle(Key.color))
+                                )
+                        }
+                        .tint(.primary)
+                        .aspectRatio(Key.aspectRatio * 1.5, contentMode: .fit)
+                        .frame(width: pegSize * 1.5)
+                    }
                 }
             }
         }
@@ -36,7 +53,7 @@ struct PegKeyboard: View {
     private var pegSizeTemplate: some View {
         HStack(spacing: Key.spacing) {
             ForEach(0..<Key.maxNumber, id: \.self) { _ in
-                Color.clear.aspectRatio(1, contentMode: .fit)
+                Color.clear.aspectRatio(Key.aspectRatio, contentMode: .fit)
             }
         }
     }
@@ -48,15 +65,16 @@ struct PegKeyboard: View {
                     onChoose?(peg)
                 } label: {
                     let keyColor = bestResult?(peg)?.color.opacity(0.5) ?? Key.color
-                    PegView(peg: peg)
+                    PegView(peg: peg.lowercased())
                         .padding(Key.innerPadding)
                         .background(
                             Key.shape.strokeBorder(Key.borderColor)
                                 .background(Key.shape.foregroundStyle(keyColor))
                         )
                 }
-                .buttonStyle(.plain)
-                .frame(width: pegSize, height: pegSize)
+                .tint(.primary)
+                .aspectRatio(Key.aspectRatio, contentMode: .fit)
+                .frame(width: pegSize)
             }
         }
     }
@@ -64,7 +82,8 @@ struct PegKeyboard: View {
 
 fileprivate struct Key {
     static let shape = RoundedRectangle(cornerRadius: 5)
-    static let innerPadding: CGFloat = 2
+    static let aspectRatio: CGFloat = 2/3
+    static let innerPadding: CGFloat = 4
     static let spacing: CGFloat = 10
     static let maxNumber = 10
     static let rowCount = 3
@@ -74,5 +93,5 @@ fileprivate struct Key {
 
 #Preview {
     @Previewable @State var selection: Int = 0
-    PegKeyboard(onChoose: nil, bestResult: nil)
+    PegKeyboard(onChoose: { print("Choose \($0)") }, onRemove: { print("Backspace") }, bestResult: nil)
 }

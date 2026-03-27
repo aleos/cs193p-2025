@@ -39,7 +39,7 @@ struct CodeWordBreakerView: View {
                 }
                 if !game.isOver {
                     Group {
-                        PegKeyboard(onChoose: changePegAtSelection, bestResult: game.bestResult)
+                        PegKeyboard(onChoose: changePegAtSelection, onRemove: removePegAtSelection, bestResult: game.bestResult)
                         if game.masterCode.hasMissingPegs {
                             ProgressView()
                         } else {
@@ -86,6 +86,11 @@ struct CodeWordBreakerView: View {
     func changePegAtSelection(to peg: Peg) {
         game.setGuessPeg(peg, at: selection)
         selection = (selection + 1) % game.guess.pegs.count
+    }
+    
+    func removePegAtSelection() {
+        selection = max(0, selection - 1)
+        game.setGuessPeg(.missing, at: selection)
     }
     
     func guess() {

@@ -36,6 +36,7 @@ struct CodeView<AncillaryView>: View where AncillaryView: View {
         HStack {
             ForEach(code.pegs.indices, id: \.self) { index in
                 PegView(peg: code.pegs[index])
+                    .aspectRatio(1, contentMode: .fit)
                     .padding(Selection.border)
                     .background { selectionBackground(for: index) }
                     .overlay { hiddenCodeOverlay }

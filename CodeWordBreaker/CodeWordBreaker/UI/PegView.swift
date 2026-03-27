@@ -20,7 +20,6 @@ struct PegView: View {
             .font(.system(size: 120))
             .minimumScaleFactor(9/120)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .aspectRatio(1, contentMode: .fit)
     }
 }
 
