@@ -31,14 +31,13 @@ struct CodeWordBreaker {
     
     mutating func restart(numberOfPegs: Int? = nil, masterWord: String? = nil) {
         let numberOfPegs = numberOfPegs ?? masterCode.pegs.count
-        self.selectedTheme = "alphabet"
+        self.selectedTheme = "words"
         masterCode = Code(kind: .master(isHidden: true), numberOfPegs: numberOfPegs)
         if let word = masterWord {
             masterCode.word = word
         } else {
             masterCode.reset()
         }
-        print("New master code is \(masterCode.word.isEmpty ? "missing" : masterCode.word)")
         guess = Code(kind: .guess, numberOfPegs: numberOfPegs)
         attempts.removeAll()
     }

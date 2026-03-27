@@ -73,9 +73,12 @@ struct CodeWordBreakerView: View {
             }
             .navigationBarTitleDisplayMode(.inline)
         }
+        // words are loaded asynchronously, so when they arrive,
+        // set the master word without restarting the whole game
         .onChange(of: words.count) {
-            if words.count > 0, game.masterCode.hasMissingPegs {
-                restart()
+            guard game.masterCode.hasMissingPegs else { return }
+            if let word = words.random(length: game.masterCode.pegs.count) {
+                game.masterCode.word = word
             }
         }
     }

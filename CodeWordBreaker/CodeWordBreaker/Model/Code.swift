@@ -22,7 +22,10 @@ struct Code {
     
     var word: String {
         get { pegs.joined() }
-        set { pegs = newValue.map(Peg.init) }
+        set {
+            pegs = newValue.map(Peg.init)
+            print("New word is \(word.isEmpty ? "missing" : newValue)")
+        }
     }
     
     init(kind: Kind, numberOfPegs: Int) {
