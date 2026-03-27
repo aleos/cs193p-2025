@@ -35,6 +35,7 @@ struct CodeWordBreaker {
         self.selectedTheme = "alphabet"
         masterCode = Code(kind: .master(isHidden: true), numberOfPegs: numberOfPegs)
         masterCode.randomize(from: words)
+        print("New master code is \(masterCode.word.isEmpty ? "missing" : masterCode.word)")
         guess = Code(kind: .guess, numberOfPegs: numberOfPegs)
         attempts.removeAll()
     }

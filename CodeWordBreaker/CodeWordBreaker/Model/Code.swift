@@ -20,6 +20,11 @@ struct Code {
     
     var hasMissingPegs: Bool { pegs.contains { $0 == Peg.missing } }
     
+    var word: String {
+        get { pegs.joined() }
+        set { pegs = newValue.map(Peg.init) }
+    }
+    
     init(kind: Kind, numberOfPegs: Int) {
         self.kind = kind
         self.pegs = Array(repeating: Peg.missing, count: numberOfPegs)
@@ -27,11 +32,10 @@ struct Code {
     
     mutating func randomize(from words: Words) {
         if let newCode = words.random(length: pegs.count) {
-            pegs = newCode.map(Peg.init)
+            word = newCode
         } else {
-            pegs = Array(repeating: Peg.missing, count: pegs.count)
+            reset()
         }
-        print(self)
     }
     
     var isHidden: Bool {
