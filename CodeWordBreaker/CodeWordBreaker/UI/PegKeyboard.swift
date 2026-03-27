@@ -11,6 +11,8 @@ struct PegKeyboard: View {
     // MARK: Data Out Function
     let onChoose: ((Peg) -> Void)?
     let onRemove: (() -> Void)?
+    let onGuess: (() -> Void)?
+    var canGuess: Bool = true
     var bestResult: ((Peg) -> Match?)? = nil
             
     // MARK: - Body
@@ -29,7 +31,18 @@ struct PegKeyboard: View {
                     row(for: ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"], pegSize: pegSize)
                     row(for: ["A", "S", "D", "F", "G", "H", "J", "K", "L"], pegSize: pegSize)
                     HStack {
-                        Spacer()
+                        Button(action: onGuess ?? {}) {
+                            PegView(peg: "⏎")
+                                .padding(Key.innerPadding)
+                                .background(
+                                    Key.shape.strokeBorder(Key.borderColor)
+                                        .background(Key.shape.foregroundStyle(Key.color))
+                                )
+                        }
+                        .tint(.primary)
+                        .disabled(!canGuess)
+                        .aspectRatio(Key.aspectRatio * 1.5, contentMode: .fit)
+                        .frame(width: pegSize * 1.5)
                         Spacer()
                         row(for: ["Z", "X", "C", "V", "B", "N", "M"], pegSize: pegSize)
                         Spacer()
@@ -65,7 +78,7 @@ struct PegKeyboard: View {
                     onChoose?(peg)
                 } label: {
                     let keyColor = bestResult?(peg)?.color.opacity(0.5) ?? Key.color
-                    PegView(peg: peg.lowercased())
+                    PegView(peg: peg)
                         .padding(Key.innerPadding)
                         .background(
                             Key.shape.strokeBorder(Key.borderColor)
@@ -82,7 +95,7 @@ struct PegKeyboard: View {
 
 fileprivate struct Key {
     static let shape = RoundedRectangle(cornerRadius: 5)
-    static let aspectRatio: CGFloat = 2/3
+    static let aspectRatio: CGFloat = 3/4
     static let innerPadding: CGFloat = 4
     static let spacing: CGFloat = 10
     static let maxNumber = 10
@@ -93,5 +106,5 @@ fileprivate struct Key {
 
 #Preview {
     @Previewable @State var selection: Int = 0
-    PegKeyboard(onChoose: { print("Choose \($0)") }, onRemove: { print("Backspace") }, bestResult: nil)
+    PegKeyboard(onChoose: { print("Choose \($0)") }, onRemove: { print("Backspace") }, onGuess: { print("Guess") }, bestResult: nil)
 }

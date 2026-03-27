@@ -38,23 +38,18 @@ struct CodeWordBreakerView: View {
                     }
                 }
                 if !game.isOver {
-                    Group {
-                        PegKeyboard(onChoose: changePegAtSelection, onRemove: removePegAtSelection, bestResult: game.bestResult)
-                        if game.masterCode.hasMissingPegs {
-                            ProgressView()
-                        } else {
-                            Button("Guess", action: guess)
-                                .buttonStyle(.glassProminent)
-                                .disabled(!game.canAttemptGuess)
-                        }
-                    }
-                    .transition(.pegChooser)
+                    PegKeyboard(onChoose: changePegAtSelection, onRemove: removePegAtSelection, onGuess: guess, canGuess: game.canAttemptGuess, bestResult: game.bestResult)
+                        .transition(.pegChooser)
                 }
             }
             .padding()
             .toolbar {
-                Button("Restart", systemImage: "arrow.circlepath") {
-                    restart()
+                if game.masterCode.hasMissingPegs {
+                    ProgressView()
+                } else {
+                    Button("Restart", systemImage: "arrow.circlepath") {
+                        restart()
+                    }
                 }
             }
             .navigationTitle(game.selectedTheme.capitalized)
