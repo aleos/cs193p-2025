@@ -30,14 +30,6 @@ struct Code {
         self.pegs = Array(repeating: Peg.missing, count: numberOfPegs)
     }
     
-    mutating func randomize(from words: Words) {
-        if let newCode = words.random(length: pegs.count) {
-            word = newCode
-        } else {
-            reset()
-        }
-    }
-    
     var isHidden: Bool {
         switch kind {
         case .master(let isHidden): isHidden

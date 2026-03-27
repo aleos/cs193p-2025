@@ -18,7 +18,6 @@ struct CodeWordBreaker {
     var guess: Code = .init(kind: .guess, numberOfPegs: 4)
     var attempts: [Code] = []
     private(set) var selectedTheme = ""
-    private let words = Words.shared
     
     var canAttemptGuess: Bool { !guess.pegs.isEmpty && !guess.hasMissingPegs && !attempts.contains { $0.pegs == guess.pegs } }
     
@@ -30,11 +29,15 @@ struct CodeWordBreaker {
         attempts.last?.pegs == masterCode.pegs
     }
     
-    mutating func restart(numberOfPegs: Int? = nil) {
+    mutating func restart(numberOfPegs: Int? = nil, masterWord: String? = nil) {
         let numberOfPegs = numberOfPegs ?? masterCode.pegs.count
         self.selectedTheme = "alphabet"
         masterCode = Code(kind: .master(isHidden: true), numberOfPegs: numberOfPegs)
-        masterCode.randomize(from: words)
+        if let word = masterWord {
+            masterCode.word = word
+        } else {
+            masterCode.reset()
+        }
         print("New master code is \(masterCode.word.isEmpty ? "missing" : masterCode.word)")
         guess = Code(kind: .guess, numberOfPegs: numberOfPegs)
         attempts.removeAll()
