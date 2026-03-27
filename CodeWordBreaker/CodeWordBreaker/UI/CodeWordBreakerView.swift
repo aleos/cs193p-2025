@@ -24,10 +24,12 @@ struct CodeWordBreakerView: View {
         NavigationStack {
             VStack {
                 CodeView(code: game.masterCode)
+                    .transaction { transaction in
+                        transaction.animation = nil
+                    }
                 ScrollView {
                     if !game.isOver || restarting {
                         CodeView(code: game.guess, selection: $selection)
-                            .animation(nil, value: game.attempts.count)
                             .opacity(restarting ? 0 : 1)
                     }
                     ForEach(game.attempts.indices.reversed(), id: \.self) { index in
