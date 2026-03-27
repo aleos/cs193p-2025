@@ -40,19 +40,18 @@ struct CodeWordBreakerView: View {
                 if !game.isOver {
                     Group {
                         PegKeyboard(onChoose: changePegAtSelection)
-                        Button("Guess", action: guess)
-                            .buttonStyle(.glassProminent)
-                            .disabled(!game.canAttemptGuess)
+                        if game.masterCode.hasMissingPegs {
+                            ProgressView()
+                        } else {
+                            Button("Guess", action: guess)
+                                .buttonStyle(.glassProminent)
+                                .disabled(!game.canAttemptGuess)
+                        }
                     }
                     .transition(.pegChooser)
                 }
             }
             .padding()
-            .overlay {
-                if game.masterCode.hasMissingPegs {
-                    ProgressView().progressViewStyle(.circular)
-                }
-            }
             .toolbar {
                 Button("Restart", systemImage: "arrow.circlepath") {
                     restart()
@@ -74,8 +73,8 @@ struct CodeWordBreakerView: View {
             }
             .navigationBarTitleDisplayMode(.inline)
         }
-        .onChange(of: words.count) { oldValue, newValue in
-            if newValue > 0, game.masterCode.hasMissingPegs {
+        .onChange(of: words.count) {
+            if words.count > 0, game.masterCode.hasMissingPegs {
                 restart()
             }
         }
@@ -103,7 +102,7 @@ struct CodeWordBreakerView: View {
             restarting = true
         } completion: {
             withAnimation(.restart) {
-                game.restart(numberOfPegs: selectedNumberOfPegs)
+                game.restart(numberOfPegs: selectedNumberOfPegs, masterWord: words.random(length: selectedNumberOfPegs))
                 selection = 0
                 restarting = false
             }
