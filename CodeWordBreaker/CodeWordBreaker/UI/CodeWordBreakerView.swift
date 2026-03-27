@@ -46,6 +46,11 @@ struct CodeWordBreakerView: View {
                 }
             }
             .padding()
+            .overlay {
+                if game.masterCode.hasMissingPegs {
+                    ProgressView().progressViewStyle(.circular)
+                }
+            }
             .toolbar {
                 Button("Restart", systemImage: "arrow.circlepath") {
                     restart()
@@ -68,7 +73,7 @@ struct CodeWordBreakerView: View {
             .navigationBarTitleDisplayMode(.inline)
         }
         .onChange(of: words.count) { oldValue, newValue in
-            if oldValue == 0, newValue > 0 {
+            if newValue > 0, game.masterCode.hasMissingPegs {
                 restart()
             }
         }
