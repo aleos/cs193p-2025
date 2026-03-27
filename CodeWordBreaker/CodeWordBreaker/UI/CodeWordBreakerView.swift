@@ -39,7 +39,7 @@ struct CodeWordBreakerView: View {
                 }
                 if !game.isOver {
                     Group {
-                        PegKeyboard(onChoose: changePegAtSelection)
+                        PegKeyboard(onChoose: changePegAtSelection, bestResult: game.bestResult)
                         if game.masterCode.hasMissingPegs {
                             ProgressView()
                         } else {

@@ -10,6 +10,7 @@ import SwiftUI
 struct PegKeyboard: View {
     // MARK: Data Out Function
     let onChoose: ((Peg) -> Void)?
+    var bestResult: ((Peg) -> Match?)? = nil
             
     // MARK: - Body
     
@@ -46,10 +47,15 @@ struct PegKeyboard: View {
                 Button {
                     onChoose?(peg)
                 } label: {
+                    let keyColor = bestResult?(peg)?.color.opacity(0.5) ?? Key.color
                     PegView(peg: peg)
                         .padding(Key.innerPadding)
-                        .background(RoundedRectangle(cornerRadius: 5).strokeBorder(.gray))
+                        .background(
+                            Key.shape.strokeBorder(Key.borderColor)
+                                .background(Key.shape.foregroundStyle(keyColor))
+                        )
                 }
+                .buttonStyle(.plain)
                 .frame(width: pegSize, height: pegSize)
             }
         }
@@ -57,13 +63,16 @@ struct PegKeyboard: View {
 }
 
 fileprivate struct Key {
+    static let shape = RoundedRectangle(cornerRadius: 5)
     static let innerPadding: CGFloat = 2
     static let spacing: CGFloat = 10
     static let maxNumber = 10
     static let rowCount = 3
+    static let borderColor: Color = Color.gray(0.85)
+    static let color: Color = Color.gray(0.98)
 }
 
 #Preview {
     @Previewable @State var selection: Int = 0
-    PegKeyboard(onChoose: nil)
+    PegKeyboard(onChoose: nil, bestResult: nil)
 }

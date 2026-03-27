@@ -58,5 +58,12 @@ struct CodeWordBreaker {
         guard guess.pegs.indices.contains(index) else { return }
         guess.pegs[index] = peg
     }
+    
+    func bestResult(for peg: Peg) -> Match? {
+        let pegMatches = attempts.flatMap { attempt in
+            zip(attempt.pegs, attempt.matches ?? []).map { (peg: $0, match: $1) }
+        }
+        return pegMatches.filter { $0.peg == peg }.map(\.match).max()
+    }
 }
 

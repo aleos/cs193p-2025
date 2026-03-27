@@ -32,3 +32,13 @@ extension Color {
         .init(hue: 148/360, saturation: 0, brightness: brightness)
     }
 }
+
+extension Match {
+    var color: Color {
+        switch self {
+        case .exact: .green
+        case .inexact: .yellow
+        case .nomatch: .gray
+        }
+    }
+}

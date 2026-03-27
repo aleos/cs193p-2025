@@ -58,7 +58,7 @@ struct CodeView<AncillaryView>: View where AncillaryView: View {
         switch code.kind {
         case .attempt(let matches):
             Selection.shape
-                .foregroundStyle(matchColor(for: matches[index]))
+                .foregroundStyle(matches[index].color)
         case .guess:
             Group {
                 if selection == index {
@@ -73,14 +73,6 @@ struct CodeView<AncillaryView>: View where AncillaryView: View {
             .animation(.selection, value: selection)
         case .master, .unknown:
             EmptyView()
-        }
-    }
-    
-    private func matchColor(for match: Match) -> Color {
-        switch match {
-        case .exact: .green
-        case .inexact: .yellow
-        case .nomatch: .gray
         }
     }
     

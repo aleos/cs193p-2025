@@ -5,6 +5,6 @@
 //  Created by Alexander Ostrovsky on 18/2/2026.
 //
 
-enum Match {
-    case nomatch, exact, inexact
+enum Match: CaseIterable, Comparable {
+    case nomatch, inexact, exact
 }
