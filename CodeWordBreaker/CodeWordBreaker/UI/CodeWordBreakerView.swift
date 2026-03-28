@@ -17,6 +17,8 @@ struct CodeWordBreakerView: View {
     @State private var selectedNumberOfPegs = 4
     @State private var restarting = false
     @State private var hideMostRecentMarkers = false
+    @State private var invalidGuessCount = 0
+    @State private var checker = UITextChecker()
     
     // MARK: - Body
     
@@ -24,12 +26,12 @@ struct CodeWordBreakerView: View {
         NavigationStack {
             VStack {
                 CodeView(code: game.masterCode)
-                    .transaction { transaction in
-                        transaction.animation = nil
-                    }
+                    .animation(nil, value: game.masterCode.word)
                 ScrollView {
                     if !game.isOver || restarting {
                         CodeView(code: game.guess, selection: $selection)
+                            .transaction { $0.animation = nil }
+                            .modifier(ShakeEffect(shakes: invalidGuessCount))
                             .opacity(restarting ? 0 : 1)
                     }
                     ForEach(game.attempts.indices.reversed(), id: \.self) { index in
@@ -89,6 +91,12 @@ struct CodeWordBreakerView: View {
     }
     
     func guess() {
+        guard checker.isAWord(game.guess.word.lowercased()) else {
+            withAnimation(.linear(duration: 0.4)) {
+                invalidGuessCount += 1
+            }
+            return
+        }
         withAnimation(.guess) {
             game.attemptGuess()
             selection = 0
@@ -104,6 +112,7 @@ struct CodeWordBreakerView: View {
         withAnimation(.restart) {
             restarting = true
         } completion: {
+            invalidGuessCount = 0
             withAnimation(.restart) {
                 game.restart(numberOfPegs: selectedNumberOfPegs, masterWord: words.random(length: selectedNumberOfPegs))
                 selection = 0
