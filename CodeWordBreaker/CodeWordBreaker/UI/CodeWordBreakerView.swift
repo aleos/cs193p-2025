@@ -39,6 +39,7 @@ struct CodeWordBreakerView: View {
                             .transition(.attempt(game.isOver))
                     }
                 }
+                .scrollClipDisabled()
                 if !game.isOver {
                     PegKeyboard(onChoose: changePegAtSelection, onRemove: removePegAtSelection, onGuess: guess, canGuess: game.canAttemptGuess, bestResult: game.bestResult)
                         .transition(.pegChooser)

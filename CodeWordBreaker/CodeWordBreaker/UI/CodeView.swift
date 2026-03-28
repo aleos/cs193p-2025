@@ -19,6 +19,7 @@ struct CodeView<AncillaryView>: View where AncillaryView: View {
     
     // MARK: Data Owned by Me
     @Namespace private var selectionNamespace
+    @State private var poppingIndex: Int?
     
     init(
         code: Code,
@@ -36,10 +37,27 @@ struct CodeView<AncillaryView>: View where AncillaryView: View {
         HStack {
             ForEach(code.pegs.indices, id: \.self) { index in
                 PegView(peg: code.pegs[index])
+                    .scaleEffect(poppingIndex == index ? 1.15 : 1)
+                    .animation(.bouncy(duration: 0.15), value: poppingIndex)
                     .aspectRatio(1, contentMode: .fit)
                     .padding(Selection.border)
-                    .background { selectionBackground(for: index) }
+                    .background { pegBackground(for: index) }
                     .overlay { hiddenCodeOverlay }
+                    .matchedGeometryEffect(
+                        id: index,
+                        in: selectionNamespace,
+                        isSource: code.kind == .guess
+                    )
+                    .onChange(of: code.pegs[index]) {
+                        guard code.kind == .guess, code.pegs[index] != .missing else { return }
+                        withAnimation(.easeOut(duration: 0.1)) {
+                            poppingIndex = index
+                        } completion: {
+                            withAnimation(.easeIn(duration: 0.1)) {
+                                poppingIndex = nil
+                            }
+                        }
+                    }
                     .onTapGesture {
                         if code.kind == .guess {
                             selection = index
@@ -52,27 +70,28 @@ struct CodeView<AncillaryView>: View where AncillaryView: View {
                     .overlay { ancillary }
             }
         }
+        .background {
+            if code.kind == .guess, selection >= 0 {
+                Selection.shape
+                    .foregroundStyle(Selection.color)
+                    .matchedGeometryEffect(
+                        id: selection,
+                        in: selectionNamespace,
+                        properties: .frame,
+                        isSource: false
+                    )
+                    .animation(.selection, value: selection)
+            }
+        }
     }
-    
+
     @ViewBuilder
-    private func selectionBackground(for index: Int) -> some View {
+    private func pegBackground(for index: Int) -> some View {
         switch code.kind {
         case .attempt(let matches):
             Selection.shape
                 .foregroundStyle(matches[index].color)
-        case .guess:
-            Group {
-                if selection == index {
-                    Selection.shape
-                        .foregroundStyle(Selection.color)
-                        .matchedGeometryEffect(
-                            id: "selection",
-                            in: selectionNamespace
-                        )
-                }
-            }
-            .animation(.selection, value: selection)
-        case .master, .unknown:
+        default:
             EmptyView()
         }
     }
