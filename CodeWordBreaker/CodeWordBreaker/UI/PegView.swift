@@ -13,8 +13,6 @@ struct PegView: View {
     
     // MARK: - Body
     
-    let pegShape = Circle()
-    
     var body: some View {
         Text(peg)
             .font(.system(size: 120))

@@ -16,7 +16,6 @@ struct CodeWordBreakerView: View {
     @State private var selection = 0
     @State private var selectedNumberOfPegs = 4
     @State private var restarting = false
-    @State private var hideMostRecentMarkers = false
     @State private var invalidGuessCount = 0
     @State private var checker = UITextChecker()
     
@@ -100,11 +99,6 @@ struct CodeWordBreakerView: View {
         withAnimation(.guess) {
             game.attemptGuess()
             selection = 0
-            hideMostRecentMarkers = true
-        } completion: {
-            withAnimation(.guess) {
-                hideMostRecentMarkers = false
-            }
         }
     }
     

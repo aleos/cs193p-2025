@@ -10,7 +10,7 @@ import Foundation
 struct Code {
     var kind: Kind
     var pegs: [Peg]
-        
+    
     enum Kind: Equatable {
         case master(isHidden: Bool)
         case guess
@@ -50,8 +50,6 @@ struct Code {
         default: nil
         }
     }
-    
-
     
     func match(against otherCode: Code) -> [Match] {
         var pegsToMatch = otherCode.pegs
