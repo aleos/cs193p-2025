@@ -26,7 +26,6 @@ struct CodeWordBreakerView: View {
         NavigationStack {
             VStack {
                 CodeView(code: game.masterCode)
-                    .animation(nil, value: game.masterCode.word)
                 ScrollView {
                     if !game.isOver || restarting {
                         CodeView(code: game.guess, selection: $selection)

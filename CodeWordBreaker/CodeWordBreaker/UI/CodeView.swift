@@ -37,6 +37,12 @@ struct CodeView<AncillaryView>: View where AncillaryView: View {
         HStack {
             ForEach(code.pegs.indices, id: \.self) { index in
                 PegView(peg: code.pegs[index])
+                    .opacity(code.isHidden ? 0 : 1)
+                    .transaction { transaction in
+                        if code.isHidden {
+                            transaction.animation = nil
+                        }
+                    }
                     .scaleEffect(poppingIndex == index ? 1.15 : 1)
                     .animation(.bouncy(duration: 0.15), value: poppingIndex)
                     .aspectRatio(1, contentMode: .fit)
@@ -58,6 +64,7 @@ struct CodeView<AncillaryView>: View where AncillaryView: View {
                             }
                         }
                     }
+                    .transition(.opacity)
                     .onTapGesture {
                         if code.kind == .guess {
                             selection = index
@@ -98,11 +105,6 @@ struct CodeView<AncillaryView>: View where AncillaryView: View {
     
     private var hiddenCodeOverlay: some View {
         Selection.shape.foregroundStyle(code.isHidden ? .gray : .clear)
-            .transaction { transaction in
-                if code.isHidden {
-                    transaction.animation = nil
-                }
-            }
     }
 }
 
