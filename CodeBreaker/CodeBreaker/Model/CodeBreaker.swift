@@ -25,9 +25,9 @@ struct Theme {
         Theme(name: "Food", pegs: ["🍎", "🍔", "🍣", "🍕", "🍩", "🍇"]),
         Theme(name: "Sports", pegs: ["⚽️", "🏀", "🏈", "🎾", "🏐", "🏓"])
     ]
-
+    
     static let `default` = Theme(name: "Colors (classic)", pegs: ["red", "green", "blue", "yellow", "orange", "purple"])
-
+    
     static func random() -> Theme {
         all.randomElement() ?? .default
     }
@@ -37,7 +37,7 @@ struct Theme {
     }
 }
 
-struct CodeBreaker {
+@Observable class CodeBreaker {
     var name: String
     var masterCode: Code = .init(kind: .master(isHidden: true), numberOfPegs: 4)
     var guess: Code = .init(kind: .guess, numberOfPegs: 4)
@@ -58,7 +58,7 @@ struct CodeBreaker {
         attempts.first?.pegs == masterCode.pegs
     }
     
-    mutating func restart(numberOfPegs: Int? = nil) {
+    func restart(numberOfPegs: Int? = nil) {
         let numberOfPegs = numberOfPegs ?? masterCode.pegs.count
         let theme = Theme.named(name) ?? Theme.random()
         self.selectedTheme = theme.name
@@ -71,7 +71,7 @@ struct CodeBreaker {
         endTime = nil
     }
     
-    mutating func attemptGuess() {
+    func attemptGuess() {
         guard canAttemptGuess else { return }
         var attempt = guess
         attempt.kind = .attempt(guess.match(against: masterCode))
@@ -83,12 +83,12 @@ struct CodeBreaker {
         }
     }
     
-    mutating func setGuessPeg(_ peg: Peg, at index: Int) {
+    func setGuessPeg(_ peg: Peg, at index: Int) {
         guard guess.pegs.indices.contains(index) else { return }
         guess.pegs[index] = peg
     }
     
-    mutating func changeGuessPeg(at index: Int) {
+    func changeGuessPeg(at index: Int) {
         let existingPeg = guess.pegs[index]
         if let indexOfExistingPegInPegChoices = pegChoices.firstIndex(of: existingPeg) {
             let newPeg = pegChoices[(indexOfExistingPegInPegChoices + 1) % pegChoices.count]

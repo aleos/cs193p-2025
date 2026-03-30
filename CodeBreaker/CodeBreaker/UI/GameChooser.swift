@@ -13,11 +13,19 @@ struct GameChooser: View {
     
     var body: some View {
         NavigationStack {
-            List($games, id: \.pegChoices, editActions: [.delete, .move]) { $game in
-                NavigationLink {
-                    CodeBreakerView(game: $game)
-                } label: {
-                    GameSummary(game: game)
+            List {
+                ForEach(games, id: \.pegChoices) { game in
+                    NavigationLink {
+                        CodeBreakerView(game: game)
+                    } label: {
+                        GameSummary(game: game)
+                    }
+                }
+                .onDelete { offsets in
+                    games.remove(atOffsets: offsets)
+                }
+                .onMove { offsets, destination in
+                    games.move(fromOffsets: offsets, toOffset: destination)
                 }
             }
             .listStyle(.plain)
