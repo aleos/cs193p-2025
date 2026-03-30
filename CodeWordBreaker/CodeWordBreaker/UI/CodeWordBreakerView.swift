@@ -8,11 +8,10 @@
 import SwiftUI
 
 struct CodeWordBreakerView: View {
-    // MARK: Data In
-    @Environment(\.words) var words
+    // MARK: Data Shared with Me
+    let game: CodeWordBreaker
     
     // MARK: Data Owned by Me
-    @State private var game = CodeWordBreaker()
     @State private var selection = 0
     @State private var invalidGuessCount = 0
     @State private var checker = UITextChecker()
@@ -20,43 +19,28 @@ struct CodeWordBreakerView: View {
     // MARK: - Body
     
     var body: some View {
-        NavigationStack {
-            VStack {
-                CodeView(code: game.masterCode)
-                ScrollView {
-                    if !game.isOver {
-                        CodeView(code: game.guess, selection: $selection)
-                            .transaction { $0.animation = nil }
-                            .modifier(ShakeEffect(shakes: invalidGuessCount))
-                    }
-                    ForEach(game.attempts.indices.reversed(), id: \.self) { index in
-                        CodeView(code: game.attempts[index])
-                            .transition(.attempt(game.isOver))
-                    }
-                }
-                .scrollClipDisabled()
+        VStack {
+            CodeView(code: game.masterCode)
+            ScrollView {
                 if !game.isOver {
-                    PegKeyboard(onChoose: changePegAtSelection, onRemove: removePegAtSelection, onGuess: guess, canGuess: game.canAttemptGuess, bestResult: game.bestResult)
-                        .transition(.pegChooser)
+                    CodeView(code: game.guess, selection: $selection)
+                        .transaction { $0.animation = nil }
+                        .modifier(ShakeEffect(shakes: invalidGuessCount))
+                }
+                ForEach(game.attempts.indices.reversed(), id: \.self) { index in
+                    CodeView(code: game.attempts[index])
+                        .transition(.attempt(game.isOver))
                 }
             }
-            .padding()
-            .toolbar {
-                if game.masterCode.hasMissingPegs {
-                    ProgressView()
-                }
-            }
-            .navigationTitle(game.selectedTheme.capitalized)
-            .navigationBarTitleDisplayMode(.inline)
-        }
-        // words are loaded asynchronously, so when they arrive,
-        // set the master word without restarting the whole game
-        .onChange(of: words.count) {
-            guard game.masterCode.hasMissingPegs else { return }
-            if let word = words.random(length: game.masterCode.pegs.count) {
-                game.masterCode.word = word
+            .scrollClipDisabled()
+            if !game.isOver {
+                PegKeyboard(onChoose: changePegAtSelection, onRemove: removePegAtSelection, onGuess: guess, canGuess: game.canAttemptGuess, bestResult: game.bestResult)
+                    .transition(.pegChooser)
             }
         }
+        .padding()
+        .navigationTitle(game.selectedTheme.capitalized)
+        .navigationBarTitleDisplayMode(.inline)
     }
     
     func changePegAtSelection(to peg: Peg) {
@@ -84,5 +68,8 @@ struct CodeWordBreakerView: View {
 }
 
 #Preview {
-    CodeWordBreakerView()
+    @Previewable let game = CodeWordBreaker(word: "WORD")
+    NavigationStack {
+        CodeWordBreakerView(game: game)
+    }
 }

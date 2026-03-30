@@ -13,7 +13,7 @@ extension Peg {
     static let missing = ""
 }
 
-struct CodeWordBreaker {
+@Observable class CodeWordBreaker {
     var masterCode: Code = .init(kind: .master(isHidden: true), numberOfPegs: 4)
     var guess: Code = .init(kind: .guess, numberOfPegs: 4)
     var attempts: [Code] = []
@@ -21,15 +21,15 @@ struct CodeWordBreaker {
     
     var canAttemptGuess: Bool { !guess.pegs.isEmpty && !guess.hasMissingPegs && !attempts.contains { $0.pegs == guess.pegs } }
     
-    init() {
-        restart()
+    init(word: String? = nil) {
+        restart(masterWord: word)
     }
     
     var isOver: Bool {
         attempts.last?.pegs == masterCode.pegs
     }
     
-    mutating func restart(numberOfPegs: Int? = nil, masterWord: String? = nil) {
+    func restart(numberOfPegs: Int? = nil, masterWord: String? = nil) {
         let numberOfPegs = numberOfPegs ?? masterCode.pegs.count
         self.selectedTheme = "words"
         masterCode = Code(kind: .master(isHidden: true), numberOfPegs: numberOfPegs)
@@ -42,7 +42,7 @@ struct CodeWordBreaker {
         attempts.removeAll()
     }
     
-    mutating func attemptGuess() {
+    func attemptGuess() {
         guard canAttemptGuess else { return }
         var attempt = guess
         attempt.kind = .attempt(guess.match(against: masterCode))
@@ -54,7 +54,7 @@ struct CodeWordBreaker {
         }
     }
     
-    mutating func setGuessPeg(_ peg: Peg, at index: Int) {
+    func setGuessPeg(_ peg: Peg, at index: Int) {
         guard guess.pegs.indices.contains(index) else { return }
         guess.pegs[index] = peg
     }
@@ -67,3 +67,12 @@ struct CodeWordBreaker {
     }
 }
 
+extension CodeWordBreaker: Identifiable, Hashable {
+    static func == (lhs: CodeWordBreaker, rhs: CodeWordBreaker) -> Bool {
+        lhs.id == rhs.id
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+}
