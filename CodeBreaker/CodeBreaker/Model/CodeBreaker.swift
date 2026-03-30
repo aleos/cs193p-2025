@@ -39,6 +39,8 @@ struct CodeBreaker {
     var attempts: [Code] = []
     private(set) var selectedTheme = ""
     private(set) var pegChoices: [Peg] = []
+    var startTime = Date.now
+    var endTime: Date?
     
     var canAttemptGuess: Bool { !guess.pegs.isEmpty && !guess.hasMissingPegs && !attempts.contains { $0.pegs == guess.pegs } }
     
@@ -59,6 +61,8 @@ struct CodeBreaker {
         masterCode.randomize(from: pegChoices)
         guess = Code(kind: .guess, numberOfPegs: numberOfPegs)
         attempts.removeAll()
+        startTime = .now
+        endTime = nil
     }
     
     mutating func attemptGuess() {
@@ -68,6 +72,7 @@ struct CodeBreaker {
         attempts.append(attempt)
         guess.reset()
         if isOver {
+            endTime = .now
             masterCode.kind = .master(isHidden: false)
         }
     }
