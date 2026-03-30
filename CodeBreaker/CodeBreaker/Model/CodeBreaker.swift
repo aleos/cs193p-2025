@@ -18,22 +18,27 @@ struct Theme {
     var pegs: [Peg]
     
     static let all: [Theme] = [
-        Theme(name: "Colors (classic)", pegs: ["red", "green", "blue", "yellow", "orange", "purple"]),
+        Theme(name: "Mastermind", pegs: ["red", "green", "blue", "yellow", "orange", "purple"]),
         Theme(name: "Faces", pegs: ["😀", "😂", "😍", "😎", "🤔", "😡"]),
         Theme(name: "Vehicles", pegs: ["🚗", "🚌", "🚲", "🚁", "🚀", "🚂"]),
         Theme(name: "Animals", pegs: ["🐶", "🐱", "🦊", "🐼", "🐸", "🐵"]),
         Theme(name: "Food", pegs: ["🍎", "🍔", "🍣", "🍕", "🍩", "🍇"]),
         Theme(name: "Sports", pegs: ["⚽️", "🏀", "🏈", "🎾", "🏐", "🏓"])
     ]
-
+    
     static let `default` = Theme(name: "Colors (classic)", pegs: ["red", "green", "blue", "yellow", "orange", "purple"])
-
+    
     static func random() -> Theme {
         all.randomElement() ?? .default
     }
+    
+    static func named(_ name: String) -> Theme? {
+        all.first { $0.name == name }
+    }
 }
 
-struct CodeBreaker {
+@Observable class CodeBreaker {
+    var name: String
     var masterCode: Code = .init(kind: .master(isHidden: true), numberOfPegs: 4)
     var guess: Code = .init(kind: .guess, numberOfPegs: 4)
     var attempts: [Code] = []
@@ -44,17 +49,18 @@ struct CodeBreaker {
     
     var canAttemptGuess: Bool { !guess.pegs.isEmpty && !guess.hasMissingPegs && !attempts.contains { $0.pegs == guess.pegs } }
     
-    init() {
+    init(name: String = "Code Breaker") {
+        self.name = name
         restart()
     }
     
     var isOver: Bool {
-        attempts.last?.pegs == masterCode.pegs
+        attempts.first?.pegs == masterCode.pegs
     }
     
-    mutating func restart(numberOfPegs: Int? = nil) {
+    func restart(numberOfPegs: Int? = nil) {
         let numberOfPegs = numberOfPegs ?? masterCode.pegs.count
-        let theme = Theme.random()
+        let theme = Theme.named(name) ?? Theme.random()
         self.selectedTheme = theme.name
         self.pegChoices = Array(theme.pegs.shuffled().prefix(numberOfPegs))
         masterCode = Code(kind: .master(isHidden: true), numberOfPegs: numberOfPegs)
@@ -65,11 +71,11 @@ struct CodeBreaker {
         endTime = nil
     }
     
-    mutating func attemptGuess() {
+    func attemptGuess() {
         guard canAttemptGuess else { return }
         var attempt = guess
         attempt.kind = .attempt(guess.match(against: masterCode))
-        attempts.append(attempt)
+        attempts.insert(attempt, at: 0)
         guess.reset()
         if isOver {
             endTime = .now
@@ -77,12 +83,12 @@ struct CodeBreaker {
         }
     }
     
-    mutating func setGuessPeg(_ peg: Peg, at index: Int) {
+    func setGuessPeg(_ peg: Peg, at index: Int) {
         guard guess.pegs.indices.contains(index) else { return }
         guess.pegs[index] = peg
     }
     
-    mutating func changeGuessPeg(at index: Int) {
+    func changeGuessPeg(at index: Int) {
         let existingPeg = guess.pegs[index]
         if let indexOfExistingPegInPegChoices = pegChoices.firstIndex(of: existingPeg) {
             let newPeg = pegChoices[(indexOfExistingPegInPegChoices + 1) % pegChoices.count]
@@ -93,3 +99,12 @@ struct CodeBreaker {
     }
 }
 
+extension CodeBreaker: Identifiable, Hashable {
+    static func == (lhs: CodeBreaker, rhs: CodeBreaker) -> Bool {
+        lhs.id == rhs.id
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+}

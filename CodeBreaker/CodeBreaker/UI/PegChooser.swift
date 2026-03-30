@@ -12,7 +12,7 @@ struct PegChooser: View {
     let choices: [Peg]
     
     // MARK: Data Out Function
-    let onChoose: ((Peg) -> Void)?
+    var onChoose: ((Peg) -> Void)? = nil
         
     // MARK: - Body
     
