@@ -13,13 +13,9 @@ struct GameChooser: View {
     
     var body: some View {
         List(games, id: \.pegChoices) { game in
-            VStack(alignment: .leading) {
-                Text(game.name).font(.title)
-                PegChooser(choices: game.pegChoices)
-                    .frame(maxHeight: 50)
-                Text("^[\(game.attempts.count) attempts](inflect: true)")
-            }
+            GameSummary(game: game)
         }
+        .listStyle(.plain)
         .onAppear {
             games.append(.init(name: "Mastermind"))
             games.append(.init(name: "Faces"))
