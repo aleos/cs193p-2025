@@ -14,10 +14,8 @@ struct GameChooser: View {
     var body: some View {
         NavigationStack {
             List {
-                ForEach(games, id: \.pegChoices) { game in
-                    NavigationLink {
-                        CodeBreakerView(game: game)
-                    } label: {
+                ForEach(games) { game in
+                    NavigationLink(value: game) {
                         GameSummary(game: game)
                     }
                 }
@@ -27,6 +25,9 @@ struct GameChooser: View {
                 .onMove { offsets, destination in
                     games.move(fromOffsets: offsets, toOffset: destination)
                 }
+            }
+            .navigationDestination(for: CodeBreaker.self) { game in
+                CodeBreakerView(game: game)
             }
             .listStyle(.plain)
             .toolbar {
