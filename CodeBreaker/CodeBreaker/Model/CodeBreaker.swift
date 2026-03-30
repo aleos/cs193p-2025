@@ -18,7 +18,7 @@ struct Theme {
     var pegs: [Peg]
     
     static let all: [Theme] = [
-        Theme(name: "Colors (classic)", pegs: ["red", "green", "blue", "yellow", "orange", "purple"]),
+        Theme(name: "Mastermind", pegs: ["red", "green", "blue", "yellow", "orange", "purple"]),
         Theme(name: "Faces", pegs: ["😀", "😂", "😍", "😎", "🤔", "😡"]),
         Theme(name: "Vehicles", pegs: ["🚗", "🚌", "🚲", "🚁", "🚀", "🚂"]),
         Theme(name: "Animals", pegs: ["🐶", "🐱", "🦊", "🐼", "🐸", "🐵"]),
@@ -31,9 +31,14 @@ struct Theme {
     static func random() -> Theme {
         all.randomElement() ?? .default
     }
+    
+    static func named(_ name: String) -> Theme? {
+        all.first { $0.name == name }
+    }
 }
 
 struct CodeBreaker {
+    var name: String
     var masterCode: Code = .init(kind: .master(isHidden: true), numberOfPegs: 4)
     var guess: Code = .init(kind: .guess, numberOfPegs: 4)
     var attempts: [Code] = []
@@ -44,7 +49,8 @@ struct CodeBreaker {
     
     var canAttemptGuess: Bool { !guess.pegs.isEmpty && !guess.hasMissingPegs && !attempts.contains { $0.pegs == guess.pegs } }
     
-    init() {
+    init(name: String = "Code Breaker") {
+        self.name = name
         restart()
     }
     
@@ -54,7 +60,7 @@ struct CodeBreaker {
     
     mutating func restart(numberOfPegs: Int? = nil) {
         let numberOfPegs = numberOfPegs ?? masterCode.pegs.count
-        let theme = Theme.random()
+        let theme = Theme.named(name) ?? Theme.random()
         self.selectedTheme = theme.name
         self.pegChoices = Array(theme.pegs.shuffled().prefix(numberOfPegs))
         masterCode = Code(kind: .master(isHidden: true), numberOfPegs: numberOfPegs)
