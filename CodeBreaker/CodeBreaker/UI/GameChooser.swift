@@ -18,6 +18,9 @@ struct GameChooser: View {
                     NavigationLink(value: game) {
                         GameSummary(game: game)
                     }
+                    NavigationLink(value: game.masterCode.pegs) {
+                        Text("Cheat")
+                    }
                 }
                 .onDelete { offsets in
                     games.remove(atOffsets: offsets)
@@ -28,6 +31,9 @@ struct GameChooser: View {
             }
             .navigationDestination(for: CodeBreaker.self) { game in
                 CodeBreakerView(game: game)
+            }
+            .navigationDestination(for: [Peg].self) { pegs in
+                PegChooser(choices: pegs)
             }
             .listStyle(.plain)
             .toolbar {
