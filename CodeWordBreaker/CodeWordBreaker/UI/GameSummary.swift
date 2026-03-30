@@ -12,9 +12,16 @@ struct GameSummary: View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            Text(game.selectedTheme).font(.title)
-            Text(game.masterCode.word)
-                .frame(maxHeight: 50)
+            if let lastAttempt = game.attempts.last {
+                CodeView(code: lastAttempt)
+            } else {
+                CodeView(
+                    code: Code(
+                        kind: .attempt(Array(repeating: .nomatch, count: game.guess.pegs.count)),
+                        numberOfPegs: game.guess.pegs.count
+                    )
+                )
+            }
             Text("^[\(game.attempts.count) attempts](inflect: true)")
         }
     }

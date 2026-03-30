@@ -20,6 +20,7 @@ struct GameChooser: View {
                 ForEach(games) { game in
                     NavigationLink(value: game) {
                         GameSummary(game: game)
+                            .allowsHitTesting(false)
                     }
                     NavigationLink(value: game.masterCode.word) {
                         Text("Cheat")

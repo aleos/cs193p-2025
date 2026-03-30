@@ -7,11 +7,11 @@
 
 import Foundation
 
-struct Code {
+struct Code: Hashable {
     var kind: Kind
     var pegs: [Peg]
     
-    enum Kind: Equatable {
+    enum Kind: Hashable {
         case master(isHidden: Bool)
         case guess
         case attempt([Match])
