@@ -8,14 +8,20 @@
 import SwiftUI
 
 struct GameChooser: View {
-    // Data Owned by Me
+    // MARK: Data Owned by Me
     @State private var games: [CodeBreaker] = []
     
     var body: some View {
-        List(games, id: \.pegChoices) { game in
-            GameSummary(game: game)
+        NavigationStack {
+            List($games, id: \.pegChoices) { $game in
+                NavigationLink {
+                    CodeBreakerView(game: $game)
+                } label: {
+                    GameSummary(game: game)
+                }
+            }
+            .listStyle(.plain)
         }
-        .listStyle(.plain)
         .onAppear {
             games.append(.init(name: "Mastermind"))
             games.append(.init(name: "Faces"))
