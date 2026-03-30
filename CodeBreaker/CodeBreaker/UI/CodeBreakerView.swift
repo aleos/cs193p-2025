@@ -20,58 +20,59 @@ struct CodeBreakerView: View {
     // MARK: - Body
     
     var body: some View {
-        NavigationStack {
-            VStack {
-                CodeView(code: game.masterCode) {
-                    ElapsedTime(startTime: game.startTime, endTime: game.endTime)
-                        .flexibleSystemFont()
-                        .monospaced()
-                        .lineLimit(1)
-                }
-                ScrollView {
-                    if !game.isOver {
-                        CodeView(code: game.guess, selection: $selection) {
-                            Button("Guess", action: guess)
-                                .flexibleSystemFont()
-                                .disabled(!game.canAttemptGuess)
-                        }
-                        .animation(nil, value: game.attempts.count)
-                        .opacity(restarting ? 0 : 1)
-                    }
-                    ForEach(game.attempts, id: \.pegs) { attempt in
-                        CodeView(code: attempt) {
-                            let showMarkers = !hideMostRecentMarkers || attempt.pegs != game.attempts.first?.pegs
-                            if showMarkers, let matches = attempt.matches {
-                                MatchMarkers(matches: matches)
-                            }
-                        }
-                        .transition(.attempt(game.isOver))
-                    }
-                }
+        VStack {
+            CodeView(code: game.masterCode)
+            ScrollView {
                 if !game.isOver {
-                    PegChooser(choices: game.pegChoices, onChoose: changePegAtSelection)
-                        .transition(.pegChooser)
-                }
-                Picker("Number of pegs", selection: $selectedNumberOfPegs) {
-                    ForEach(3...6, id: \.self) {
-                        Text("^[\($0) pegs](inflect: true)")
+                    CodeView(code: game.guess, selection: $selection) {
+                        Button("Guess", action: guess)
+                            .flexibleSystemFont()
+                            .disabled(!game.canAttemptGuess)
                     }
+                    .animation(nil, value: game.attempts.count)
+                    .opacity(restarting ? 0 : 1)
                 }
-                .pickerStyle(.segmented)
-                .onChange(of: selectedNumberOfPegs) {
-                    game.restart(numberOfPegs: selectedNumberOfPegs)
-                    selection = 0
+                ForEach(game.attempts, id: \.pegs) { attempt in
+                    CodeView(code: attempt) {
+                        let showMarkers = !hideMostRecentMarkers || attempt.pegs != game.attempts.first?.pegs
+                        if showMarkers, let matches = attempt.matches {
+                            MatchMarkers(matches: matches)
+                        }
+                    }
+                    .transition(.attempt(game.isOver))
                 }
             }
-            .padding()
-            .toolbar {
+            if !game.isOver {
+                PegChooser(choices: game.pegChoices, onChoose: changePegAtSelection)
+                    .transition(.pegChooser)
+            }
+            Picker("Number of pegs", selection: $selectedNumberOfPegs) {
+                ForEach(3...6, id: \.self) {
+                    Text("^[\($0) pegs](inflect: true)")
+                }
+            }
+            .pickerStyle(.segmented)
+            .onChange(of: selectedNumberOfPegs) {
+                game.restart(numberOfPegs: selectedNumberOfPegs)
+                selection = 0
+            }
+        }
+        .padding()
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
                 Button("Restart", systemImage: "arrow.circlepath") {
                     restart()
                 }
             }
-            .navigationTitle(game.selectedTheme)
-            .navigationBarTitleDisplayMode(.inline)
+            ToolbarItem {
+                ElapsedTime(startTime: game.startTime, endTime: game.endTime)
+                    .monospaced()
+                    .lineLimit(1)
+                    .fixedSize(horizontal: true, vertical: false)
+            }
         }
+        .navigationTitle(game.selectedTheme)
+        .navigationBarTitleDisplayMode(.inline)
     }
     
     func changePegAtSelection(to peg: Peg) {
@@ -106,5 +107,7 @@ struct CodeBreakerView: View {
 
 #Preview {
     @Previewable @State var game = CodeBreaker()
-    CodeBreakerView(game: $game)
+    NavigationStack {
+        CodeBreakerView(game: $game)
+    }
 }
