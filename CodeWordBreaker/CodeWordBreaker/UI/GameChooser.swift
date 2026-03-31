@@ -13,38 +13,40 @@ struct GameChooser: View {
     
     // MARK: Data Owned by Me
     @State private var games: [CodeWordBreaker] = .samples
+    @State private var path = NavigationPath()
     
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             List {
-                ForEach(games.sorted(using: KeyPathComparator(\.lastAttemptedAt, order: .reverse))) { game in
+                ForEach(games) { game in
                     NavigationLink(value: game) {
                         GameSummary(game: game)
                             .allowsHitTesting(false)
                     }
-                    NavigationLink(value: game.masterCode.word) {
-                        Text("Cheat")
+                    .swipeActions(edge: .leading) {
+                        NavigationLink(value: game.masterCode.word) {
+                            Label("Cheat", systemImage: "eye")
+                                .tint(.purple)
+                        }
                     }
                 }
+                .onDelete { offsets in
+                    games.remove(atOffsets: offsets)
+                }
             }
+            .listStyle(.plain)
+            .onAppear(perform: sortGames)
             .navigationDestination(for: CodeWordBreaker.self) { game in
                 CodeWordBreakerView(game: game)
             }
             .navigationDestination(for: String.self) { word in
                 Text(word).font(.largeTitle)
             }
-            .listStyle(.plain)
             .toolbar {
                 if words.count == 0 {
                     ProgressView()
                 } else {
-                    Button("New game", systemImage: "plus") {
-                        let game = CodeWordBreaker()
-                        initializeMasterCode(for: game)
-                        withAnimation {
-                            games.insert(game, at: 0)
-                        }
-                    }
+                    newGame
                 }
             }
         }
@@ -55,6 +57,18 @@ struct GameChooser: View {
         .onAppear {
             guard words.count > 0 else { return }
             initializeMasterCodes()
+        }
+    }
+    
+    private var newGame: some View {
+        Button("New game", systemImage: "plus") {
+            let game = CodeWordBreaker()
+            initializeMasterCode(for: game)
+            withAnimation {
+                games.insert(game, at: 0)
+                sortGames()
+            }
+            path.append(game)
         }
     }
     
@@ -69,6 +83,10 @@ struct GameChooser: View {
             return
         }
         game.masterCode.word = word
+    }
+    
+    private func sortGames() {
+        games.sort(using: KeyPathComparator(\.lastAttemptedAt, order: .reverse))
     }
 }
 
