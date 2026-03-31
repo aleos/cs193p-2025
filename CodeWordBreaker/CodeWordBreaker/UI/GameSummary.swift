@@ -12,16 +12,19 @@ struct GameSummary: View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            if let lastAttempt = game.attempts.last {
-                CodeView(code: lastAttempt)
-            } else {
-                CodeView(
-                    code: Code(
-                        kind: .attempt(Array(repeating: .nomatch, count: game.guess.pegs.count)),
-                        numberOfPegs: game.guess.pegs.count
+            Group {
+                if let lastAttempt = game.attempts.last {
+                    CodeView(code: lastAttempt)
+                } else {
+                    CodeView(
+                        code: Code(
+                            kind: .attempt(Array(repeating: .nomatch, count: game.guess.pegs.count)),
+                            numberOfPegs: game.guess.pegs.count
+                        )
                     )
-                )
+                }
             }
+            .frame(maxHeight: 50)
             HStack {
                 Text("^[\(game.attempts.count) attempts](inflect: true)")
                 Spacer()

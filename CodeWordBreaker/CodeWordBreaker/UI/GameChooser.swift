@@ -14,7 +14,8 @@ struct GameChooser: View {
     // MARK: Data Owned by Me
     @State private var games: [CodeWordBreaker] = .samples
     @State private var path = NavigationPath()
-    @State private var numberOfLetters: Int = CodeWordBreaker.defaultNumberOfLetters
+    @State private var defaultWordLength: Int = CodeWordBreaker.defaultNumberOfLetters
+    @State private var isSettingsPresented: Bool = false
     
     var body: some View {
         NavigationStack(path: $path) {
@@ -43,11 +44,21 @@ struct GameChooser: View {
             .navigationDestination(for: String.self) { word in
                 Text(word).font(.largeTitle)
             }
+            .sheet(isPresented: $isSettingsPresented) {
+                Settings(isPresented: $isSettingsPresented, defaultWordLength: $defaultWordLength)
+            }
             .toolbar {
-                if words.count == 0 {
-                    ProgressView()
-                } else {
-                    newGame
+                ToolbarItem(placement: .primaryAction) {
+                    if words.count == 0 {
+                        ProgressView()
+                    } else {
+                        newGame
+                    }
+                }
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Settings", systemImage: "gearshape") {
+                        isSettingsPresented = true
+                    }
                 }
             }
         }
@@ -65,7 +76,7 @@ struct GameChooser: View {
         Menu("New game", systemImage: "plus") {
             ForEach(3...6, id: \.self) { numberOfLetters in
                 Button("^[\(numberOfLetters) letters](inflect: true)") {
-                    self.numberOfLetters = numberOfLetters
+                    self.defaultWordLength = numberOfLetters
                     createNewGame()
                 }
             }
@@ -90,7 +101,7 @@ struct GameChooser: View {
     
     private func initializeMasterCode(for game: CodeWordBreaker) {
         guard game.masterCode.hasMissingPegs else { return } // The master code has already been set
-        guard let word = words.random(length: numberOfLetters) else {
+        guard let word = words.random(length: defaultWordLength) else {
             assertionFailure("Can't set master code: no words")
             return
         }
