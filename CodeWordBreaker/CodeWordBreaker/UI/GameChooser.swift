@@ -17,10 +17,14 @@ struct GameChooser: View {
     @State private var isSettingsPresented: Bool = false
     @State private var selectedGame: CodeWordBreaker?
     
+    private var sortedGames: [CodeWordBreaker] {
+        games.sorted(using: KeyPathComparator(\.lastAttemptedAt, order: .reverse))
+    }
+    
     var body: some View {
         NavigationSplitView {
             List(selection: $selectedGame) {
-                ForEach(games) { game in
+                ForEach(sortedGames) { game in
                     NavigationLink(value: game) {
                         GameSummary(game: game)
                             .allowsHitTesting(false)
@@ -33,11 +37,11 @@ struct GameChooser: View {
                     }
                 }
                 .onDelete { offsets in
-                    games.remove(atOffsets: offsets)
+                    let toDelete = offsets.map { sortedGames[$0] }
+                    games.removeAll { toDelete.contains($0) }
                 }
             }
             .listStyle(.plain)
-            .onAppear(perform: sortGames)
             .navigationDestination(for: String.self) { word in
                 Text(word).font(.largeTitle)
             }
@@ -93,7 +97,6 @@ struct GameChooser: View {
         initializeMasterCode(for: game)
         withAnimation {
             games.insert(game, at: 0)
-            sortGames()
         }
         selectedGame = game
     }
@@ -109,10 +112,6 @@ struct GameChooser: View {
             return
         }
         game.restart(masterWord: word)
-    }
-    
-    private func sortGames() {
-        games.sort(using: KeyPathComparator(\.lastAttemptedAt, order: .reverse))
     }
 }
 
