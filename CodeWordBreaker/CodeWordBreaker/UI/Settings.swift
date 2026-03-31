@@ -9,7 +9,7 @@ import SwiftUI
 
 struct Settings: View {
     // MARK: Data In
-    @Environment(\.settings) var settings
+    @Environment(\.settings) private var settings
     
     // MARK: Data Shared with Me
     @Binding var isPresented: Bool
@@ -18,17 +18,21 @@ struct Settings: View {
         @Bindable var settings = settings
         NavigationStack {
             Form {
-                Picker(selection: $settings.defaultWordLength) {
-                    ForEach(3...6, id: \.self) { defaultWordLength in
-                        Text("\(defaultWordLength)")
-                            .tag(defaultWordLength)
+                Section("Words") {
+                    Picker(selection: $settings.defaultWordLength) {
+                        ForEach(3...6, id: \.self) { defaultWordLength in
+                            Text("\(defaultWordLength)")
+                                .tag(defaultWordLength)
+                        }
+                    } label: {
+                        Label("Default word length", systemImage: "number")
                     }
-                } label: {
-                    Label("Default word length", systemImage: "number")
                 }
-                ColorPicker("Exact color", selection: $settings.exactMatchColor)
-                ColorPicker("Inexact color", selection: $settings.inexactMatchColor)
-                ColorPicker("No match color", selection: $settings.noMatchColor)
+                Section("Match colours") {
+                    ColorPicker("Exact", selection: $settings.exactMatchColor)
+                    ColorPicker("Inexact", selection: $settings.inexactMatchColor)
+                    ColorPicker("No match", selection: $settings.noMatchColor)
+                }
             }
             .toolbar {
                 Button("Done") { isPresented = false }
@@ -36,4 +40,9 @@ struct Settings: View {
             .navigationTitle("Settings")
         }
     }
+}
+
+#Preview {
+    @Previewable @State var isPresented: Bool = true
+    Settings(isPresented: $isPresented)
 }
