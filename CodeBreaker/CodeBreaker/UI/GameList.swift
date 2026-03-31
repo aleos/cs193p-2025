@@ -38,6 +38,12 @@ struct GameList: View {
         }
         .listStyle(.plain)
         .toolbar {
+            Button("Add game", systemImage: "plus") {
+                withAnimation {
+                    let newGame = CodeBreaker(name: "Mastermind")
+                    games.append(newGame)
+                }
+            }
             EditButton()
         }
         .onAppear(perform: addSampleGames)
