@@ -12,7 +12,7 @@ struct GameChooser: View {
     @Environment(\.words) var words
     
     // MARK: Data Owned by Me
-    @State private var games: [CodeWordBreaker] = [.init(), .init(), .init()]
+    @State private var games: [CodeWordBreaker] = .samples
     
     var body: some View {
         NavigationStack {
