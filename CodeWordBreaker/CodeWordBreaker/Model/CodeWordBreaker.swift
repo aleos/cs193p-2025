@@ -20,6 +20,7 @@ extension Peg {
     var guess: Code = .init(kind: .guess, numberOfPegs: defaultNumberOfPegs)
     var attempts: [Code] = []
     private(set) var lastAppearedAt: Date?
+    private(set) var lastAttemptedAt: Date?
     private(set) var accumulatedTime: TimeInterval = 0
     private(set) var endTime: Date?
     
@@ -51,6 +52,7 @@ extension Peg {
         var attempt = guess
         attempt.kind = .attempt(guess.match(against: masterCode))
         attempts.append(attempt)
+        lastAttemptedAt = .now
         print("Attempt: \(attempt)")
         guess.reset()
         if isOver {

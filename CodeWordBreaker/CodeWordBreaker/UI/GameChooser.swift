@@ -17,7 +17,7 @@ struct GameChooser: View {
     var body: some View {
         NavigationStack {
             List {
-                ForEach(games) { game in
+                ForEach(games.sorted(using: KeyPathComparator(\.lastAttemptedAt, order: .reverse))) { game in
                     NavigationLink(value: game) {
                         GameSummary(game: game)
                             .allowsHitTesting(false)
