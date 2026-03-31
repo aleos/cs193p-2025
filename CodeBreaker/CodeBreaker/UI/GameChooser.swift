@@ -20,12 +20,24 @@ struct GameChooser: View {
                     NavigationLink(value: game) {
                         GameSummary(game: game)
                     }
+                    .contextMenu {
+                        Button("Delete", systemImage: "minus.circle", role: .destructive) {
+                            withAnimation {
+                                games.removeAll { $0 == game }
+                            }
+                        }
+                    }
                 }
                 .onDelete { offsets in
                     games.remove(atOffsets: offsets)
                 }
                 .onMove { offsets, destination in
                     games.move(fromOffsets: offsets, toOffset: destination)
+                }
+            }
+            .onChange(of: games) {
+                if let selection, !games.contains(selection) {
+                    self.selection = nil
                 }
             }
             .navigationTitle("Code Breaker")
