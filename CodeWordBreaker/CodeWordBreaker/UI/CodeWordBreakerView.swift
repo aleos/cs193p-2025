@@ -45,6 +45,14 @@ struct CodeWordBreakerView: View {
             }
         }
         .padding(.top)
+        .toolbar {
+            ToolbarItem {
+                ElapsedTime(startTime: game.startTime, endTime: game.endTime)
+                    .monospaced()
+                    .lineLimit(1)
+                    .fixedSize(horizontal: true, vertical: false)
+            }
+        }
         .navigationBarTitleDisplayMode(.inline)
     }
     

@@ -19,6 +19,8 @@ extension Peg {
     var masterCode: Code = .init(kind: .master(isHidden: true), numberOfPegs: defaultNumberOfPegs)
     var guess: Code = .init(kind: .guess, numberOfPegs: defaultNumberOfPegs)
     var attempts: [Code] = []
+    var startTime = Date.now
+    var endTime: Date?
     
     var canAttemptGuess: Bool { !guess.pegs.isEmpty && !guess.hasMissingPegs && !attempts.contains { $0.pegs == guess.pegs } }
     
@@ -40,6 +42,8 @@ extension Peg {
         }
         guess = Code(kind: .guess, numberOfPegs: numberOfPegs)
         attempts.removeAll()
+        startTime = .now
+        endTime = nil
     }
     
     func attemptGuess() {
@@ -51,6 +55,7 @@ extension Peg {
         guess.reset()
         if isOver {
             masterCode.kind = .master(isHidden: false)
+            endTime = .now
         }
     }
     
