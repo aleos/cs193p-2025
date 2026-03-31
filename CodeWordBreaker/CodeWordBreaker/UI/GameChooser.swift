@@ -33,9 +33,18 @@ struct GameChooser: View {
             .navigationDestination(for: String.self) { word in
                 Text(word).font(.largeTitle)
             }
+            .listStyle(.plain)
             .toolbar {
                 if words.count == 0 {
                     ProgressView()
+                } else {
+                    Button("New game", systemImage: "plus") {
+                        let game = CodeWordBreaker()
+                        initializeMasterCode(for: game)
+                        withAnimation {
+                            games.insert(game, at: 0)
+                        }
+                    }
                 }
             }
         }
