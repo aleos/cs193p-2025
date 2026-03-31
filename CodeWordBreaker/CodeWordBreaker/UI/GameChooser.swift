@@ -14,12 +14,12 @@ struct GameChooser: View {
     
     // MARK: Data Owned by Me
     @State private var games: [CodeWordBreaker] = .samples
-    @State private var path = NavigationPath()
     @State private var isSettingsPresented: Bool = false
+    @State private var selectedGame: CodeWordBreaker?
     
     var body: some View {
-        NavigationStack(path: $path) {
-            List {
+        NavigationSplitView {
+            List(selection: $selectedGame) {
                 ForEach(games) { game in
                     NavigationLink(value: game) {
                         GameSummary(game: game)
@@ -38,9 +38,6 @@ struct GameChooser: View {
             }
             .listStyle(.plain)
             .onAppear(perform: sortGames)
-            .navigationDestination(for: CodeWordBreaker.self) { game in
-                CodeWordBreakerView(game: game)
-            }
             .navigationDestination(for: String.self) { word in
                 Text(word).font(.largeTitle)
             }
@@ -60,6 +57,12 @@ struct GameChooser: View {
                         isSettingsPresented = true
                     }
                 }
+            }
+        } detail: {
+            if let selectedGame {
+                CodeWordBreakerView(game: selectedGame)
+            } else {
+                Text("Choose a game")
             }
         }
         .onChange(of: words.count) { oldValue, newValue in
@@ -92,7 +95,7 @@ struct GameChooser: View {
             games.insert(game, at: 0)
             sortGames()
         }
-        path.append(game)
+        selectedGame = game
     }
     
     private func initializeMasterCodes() {

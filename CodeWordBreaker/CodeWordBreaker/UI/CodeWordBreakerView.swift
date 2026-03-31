@@ -39,8 +39,9 @@ struct CodeWordBreakerView: View {
             if !game.isOver {
                 PegKeyboard(onChoose: changePegAtSelection, onErase: removePegAtSelection, onGuess: guess, canGuess: game.canAttemptGuess, bestResult: game.bestResult)
                     .padding()
-                    .ignoresSafeArea(.all, edges: .bottom)
                     .background(.background)
+                    .clipShape(.rect(cornerRadius: 16))
+                    .ignoresSafeArea(.all, edges: .bottom)
                     .transition(.pegChooser)
             }
         }
