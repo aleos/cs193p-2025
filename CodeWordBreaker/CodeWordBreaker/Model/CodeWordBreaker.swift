@@ -19,8 +19,9 @@ extension Peg {
     var masterCode: Code = .init(kind: .master(isHidden: true), numberOfPegs: defaultNumberOfPegs)
     var guess: Code = .init(kind: .guess, numberOfPegs: defaultNumberOfPegs)
     var attempts: [Code] = []
-    var startTime = Date.now
-    var endTime: Date?
+    private(set) var lastAppearedAt: Date?
+    private(set) var accumulatedTime: TimeInterval = 0
+    private(set) var endTime: Date?
     
     var canAttemptGuess: Bool { !guess.pegs.isEmpty && !guess.hasMissingPegs && !attempts.contains { $0.pegs == guess.pegs } }
     
@@ -42,7 +43,6 @@ extension Peg {
         }
         guess = Code(kind: .guess, numberOfPegs: numberOfPegs)
         attempts.removeAll()
-        startTime = .now
         endTime = nil
     }
     
@@ -55,6 +55,7 @@ extension Peg {
         guess.reset()
         if isOver {
             masterCode.kind = .master(isHidden: false)
+            pause()
             endTime = .now
         }
     }
@@ -69,6 +70,17 @@ extension Peg {
             zip(attempt.pegs, attempt.matches ?? []).map { (peg: $0, match: $1) }
         }
         return pegMatches.filter { $0.peg == peg }.map(\.match).max()
+    }
+    
+    func resume() {
+        guard endTime == nil else { return }
+        lastAppearedAt = .now
+    }
+    
+    func pause() {
+        guard let lastAppearedAt else { return }
+        self.lastAppearedAt = nil
+        accumulatedTime += Date.now.timeIntervalSince(lastAppearedAt)
     }
 }
 
@@ -89,7 +101,7 @@ extension CodeWordBreaker {
 extension Array where Element == CodeWordBreaker {
     static var samples: Self {
         let apple = CodeWordBreaker(word: "apple")
-        makeAttempts(["dream", "flame", "truck"], in: apple)
+        makeAttempts(["truck"], in: apple)
         let swift = CodeWordBreaker(word: "swift")
         makeAttempts(["house", "plant", "water", "beach", "swift"], in: swift)
         let quick = CodeWordBreaker(word: "quick")

@@ -45,12 +45,16 @@ struct CodeWordBreakerView: View {
             }
         }
         .padding(.top)
+        .onAppear(perform: game.resume)
+        .onDisappear(perform: game.pause)
         .toolbar {
-            ToolbarItem {
-                ElapsedTime(startTime: game.startTime, endTime: game.endTime)
-                    .monospaced()
-                    .lineLimit(1)
-                    .fixedSize(horizontal: true, vertical: false)
+            if let lastAppearedAt = game.lastAppearedAt {
+                ToolbarItem {
+                    ElapsedTime(startTime: lastAppearedAt.addingTimeInterval(-game.accumulatedTime), endTime: game.endTime)
+                        .monospaced()
+                        .lineLimit(1)
+                        .fixedSize(horizontal: true, vertical: false)
+                }
             }
         }
         .navigationBarTitleDisplayMode(.inline)

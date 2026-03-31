@@ -22,8 +22,28 @@ struct GameSummary: View {
                     )
                 )
             }
-            Text("^[\(game.attempts.count) attempts](inflect: true)")
+            HStack {
+                Text("^[\(game.attempts.count) attempts](inflect: true)")
+                Spacer()
+                time
+            }
         }
+    }
+    
+    private var time: some View {
+        let startTime: Date
+        var endTime: Date?
+        if let lastAppearedAt = game.lastAppearedAt {
+            startTime = lastAppearedAt.addingTimeInterval(-game.accumulatedTime)
+            endTime = game.endTime
+        } else {
+            startTime = .now.addingTimeInterval(-game.accumulatedTime)
+            endTime = .now
+        }
+        return ElapsedTime(startTime: startTime, endTime: endTime)
+            .monospaced()
+            .lineLimit(1)
+            .fixedSize(horizontal: true, vertical: false)
     }
 }
 
