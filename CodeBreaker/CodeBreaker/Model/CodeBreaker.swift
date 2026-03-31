@@ -43,7 +43,7 @@ struct Theme {
     var guess: Code = .init(kind: .guess, numberOfPegs: 4)
     var attempts: [Code] = []
     private(set) var selectedTheme = ""
-    private(set) var pegChoices: [Peg] = []
+    var pegChoices: [Peg] = []
     var startTime = Date.now
     var endTime: Date?
     
