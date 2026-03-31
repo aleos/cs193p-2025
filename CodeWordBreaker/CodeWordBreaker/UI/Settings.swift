@@ -8,13 +8,17 @@
 import SwiftUI
 
 struct Settings: View {
+    // MARK: Data In
+    @Environment(\.settings) var settings
+    
+    // MARK: Data Shared with Me
     @Binding var isPresented: Bool
-    @Binding var defaultWordLength: Int
     
     var body: some View {
+        @Bindable var settings = settings
         NavigationStack {
             Form {
-                Picker(selection: $defaultWordLength) {
+                Picker(selection: $settings.defaultWordLength) {
                     ForEach(3...6, id: \.self) { defaultWordLength in
                         Text("\(defaultWordLength)")
                             .tag(defaultWordLength)
@@ -22,6 +26,9 @@ struct Settings: View {
                 } label: {
                     Label("Default word length", systemImage: "number")
                 }
+                ColorPicker("Exact color", selection: $settings.exactMatchColor)
+                ColorPicker("Inexact color", selection: $settings.inexactMatchColor)
+                ColorPicker("No match color", selection: $settings.noMatchColor)
             }
             .toolbar {
                 Button("Done") { isPresented = false }

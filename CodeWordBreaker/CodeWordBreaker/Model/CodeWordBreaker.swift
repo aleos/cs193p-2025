@@ -13,7 +13,8 @@ extension Peg {
     static let missing = ""
 }
 
-@Observable final class CodeWordBreaker {
+@Observable
+final class CodeWordBreaker {
     static let defaultNumberOfLetters: Int = 5
     
     var masterCode: Code = .init(kind: .master(isHidden: true), numberOfPegs: defaultNumberOfLetters)

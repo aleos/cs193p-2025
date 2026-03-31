@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct PegKeyboard: View {
+    // MARK: Data In
+    @Environment(\.settings) private var settings
+    
     // MARK: Data Out Function
     let onChoose: ((Peg) -> Void)?
     let onErase: (() -> Void)?
@@ -85,7 +88,7 @@ struct PegKeyboard: View {
                 Button {
                     onChoose?(peg)
                 } label: {
-                    let keyColor = bestResult?(peg)?.color.opacity(0.5) ?? Key.color
+                    let keyColor = bestResult?(peg).flatMap(settings.color)?.opacity(0.5) ?? Key.color
                     PegView(peg: peg)
                         .padding(Key.innerPadding)
                         .background(

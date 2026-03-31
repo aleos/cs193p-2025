@@ -9,6 +9,7 @@ import SwiftUI
 
 struct CodeView<AncillaryView>: View where AncillaryView: View {
     // MARK: Data In
+    @Environment(\.settings) var settings
     let code: Code
     
     // MARK: Data Shared with Me
@@ -91,7 +92,7 @@ struct CodeView<AncillaryView>: View where AncillaryView: View {
             }
         }
     }
-
+    
     @ViewBuilder
     private func pegBackground(for index: Int) -> some View {
         switch code.kind {
@@ -101,7 +102,7 @@ struct CodeView<AncillaryView>: View where AncillaryView: View {
                     .strokeBorder(.gray)
             } else {
                 Selection.shape
-                    .foregroundStyle(matches[index].color)
+                    .foregroundStyle(settings.color(for: matches[index]))
             }
         default:
             EmptyView()

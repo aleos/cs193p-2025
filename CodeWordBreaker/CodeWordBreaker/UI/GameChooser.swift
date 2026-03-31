@@ -10,11 +10,11 @@ import SwiftUI
 struct GameChooser: View {
     // MARK: Data In
     @Environment(\.words) var words
+    @Environment(\.settings) var settings
     
     // MARK: Data Owned by Me
     @State private var games: [CodeWordBreaker] = .samples
     @State private var path = NavigationPath()
-    @AppStorage("defaultWordLength") private var defaultWordLength: Int = CodeWordBreaker.defaultNumberOfLetters
     @State private var isSettingsPresented: Bool = false
     
     var body: some View {
@@ -45,7 +45,7 @@ struct GameChooser: View {
                 Text(word).font(.largeTitle)
             }
             .sheet(isPresented: $isSettingsPresented) {
-                Settings(isPresented: $isSettingsPresented, defaultWordLength: $defaultWordLength)
+                Settings(isPresented: $isSettingsPresented)
             }
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
@@ -76,7 +76,7 @@ struct GameChooser: View {
         Menu("New game", systemImage: "plus") {
             ForEach(3...6, id: \.self) { numberOfLetters in
                 Button("^[\(numberOfLetters) letters](inflect: true)") {
-                    self.defaultWordLength = numberOfLetters
+                    settings.defaultWordLength = numberOfLetters
                     createNewGame()
                 }
             }
@@ -101,7 +101,7 @@ struct GameChooser: View {
     
     private func initializeMasterCode(for game: CodeWordBreaker) {
         guard game.masterCode.hasMissingPegs else { return } // The master code has already been set
-        guard let word = words.random(length: defaultWordLength) else {
+        guard let word = words.random(length: settings.defaultWordLength) else {
             assertionFailure("Can't set master code: no words")
             return
         }
