@@ -27,6 +27,7 @@ struct CodeBreakerView: View {
                     CodeView(code: game.guess, selection: $selection) {
                         Button("Guess", action: guess)
                             .flexibleSystemFont()
+                            .lineLimit(1)
                             .disabled(!game.canAttemptGuess)
                     }
                     .animation(nil, value: game.attempts.count)
@@ -45,6 +46,7 @@ struct CodeBreakerView: View {
             if !game.isOver {
                 PegChooser(choices: game.pegChoices, onChoose: changePegAtSelection)
                     .transition(.pegChooser)
+                    .frame(maxHeight: 90)
             }
             Picker("Number of pegs", selection: $selectedNumberOfPegs) {
                 ForEach(3...6, id: \.self) {
