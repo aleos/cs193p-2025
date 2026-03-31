@@ -46,6 +46,7 @@ struct CodeBreakerView: View {
             if !game.isOver {
                 PegChooser(choices: game.pegChoices, onChoose: changePegAtSelection)
                     .transition(.pegChooser)
+                    .frame(maxHeight: 90)
             }
             Picker("Number of pegs", selection: $selectedNumberOfPegs) {
                 ForEach(3...6, id: \.self) {
