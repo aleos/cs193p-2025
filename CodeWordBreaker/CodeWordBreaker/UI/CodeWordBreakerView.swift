@@ -21,9 +21,11 @@ struct CodeWordBreakerView: View {
     var body: some View {
         VStack {
             CodeView(code: game.masterCode)
+                .padding(.horizontal)
             ScrollView {
                 if !game.isOver {
                     CodeView(code: game.guess, selection: $selection)
+                        .padding(.horizontal)
                         .transaction { $0.animation = nil }
                         .modifier(ShakeEffect(shakes: invalidGuessCount))
                 }
@@ -31,15 +33,18 @@ struct CodeWordBreakerView: View {
                     CodeView(code: game.attempts[index])
                         .transition(.attempt(game.isOver))
                 }
+                .padding(.horizontal)
             }
             .scrollClipDisabled()
             if !game.isOver {
-                PegKeyboard(onChoose: changePegAtSelection, onRemove: removePegAtSelection, onGuess: guess, canGuess: game.canAttemptGuess, bestResult: game.bestResult)
+                PegKeyboard(onChoose: changePegAtSelection, onErase: removePegAtSelection, onGuess: guess, canGuess: game.canAttemptGuess, bestResult: game.bestResult)
+                    .padding()
+                    .ignoresSafeArea(.all, edges: .bottom)
+                    .background(.background)
                     .transition(.pegChooser)
             }
         }
-        .padding()
-        .navigationTitle(game.selectedTheme.capitalized)
+        .padding(.top)
         .navigationBarTitleDisplayMode(.inline)
     }
     
@@ -68,7 +73,7 @@ struct CodeWordBreakerView: View {
 }
 
 #Preview {
-    @Previewable let game = CodeWordBreaker(word: "WORD")
+    @Previewable let game: CodeWordBreaker = .sample
     NavigationStack {
         CodeWordBreakerView(game: game)
     }
