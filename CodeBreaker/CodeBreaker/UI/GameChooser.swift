@@ -12,7 +12,7 @@ struct GameChooser: View {
     @State private var games: [CodeBreaker] = []
     
     var body: some View {
-        NavigationStack {
+        NavigationSplitView(columnVisibility: .constant(.all)) {
             List {
                 ForEach(games) { game in
                     NavigationLink(value: game) {
@@ -39,7 +39,10 @@ struct GameChooser: View {
             .toolbar {
                 EditButton()
             }
+        } detail: {
+            Text("Choose a game")
         }
+        .navigationSplitViewStyle(.balanced)
         .onAppear {
             games.append(.init(name: "Mastermind"))
             games.append(.init(name: "Faces"))

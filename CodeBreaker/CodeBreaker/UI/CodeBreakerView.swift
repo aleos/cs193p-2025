@@ -27,6 +27,7 @@ struct CodeBreakerView: View {
                     CodeView(code: game.guess, selection: $selection) {
                         Button("Guess", action: guess)
                             .flexibleSystemFont()
+                            .lineLimit(1)
                             .disabled(!game.canAttemptGuess)
                     }
                     .animation(nil, value: game.attempts.count)
