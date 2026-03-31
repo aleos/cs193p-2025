@@ -14,7 +14,7 @@ struct GameChooser: View {
     // MARK: Data Owned by Me
     @State private var games: [CodeWordBreaker] = .samples
     @State private var path = NavigationPath()
-    @State private var defaultWordLength: Int = CodeWordBreaker.defaultNumberOfLetters
+    @AppStorage("defaultWordLength") private var defaultWordLength: Int = CodeWordBreaker.defaultNumberOfLetters
     @State private var isSettingsPresented: Bool = false
     
     var body: some View {
