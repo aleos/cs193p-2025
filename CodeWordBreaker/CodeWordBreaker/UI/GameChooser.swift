@@ -14,6 +14,7 @@ struct GameChooser: View {
     // MARK: Data Owned by Me
     @State private var games: [CodeWordBreaker] = .samples
     @State private var path = NavigationPath()
+    @State private var numberOfLetters: Int = CodeWordBreaker.defaultNumberOfLetters
     
     var body: some View {
         NavigationStack(path: $path) {
@@ -61,15 +62,26 @@ struct GameChooser: View {
     }
     
     private var newGame: some View {
-        Button("New game", systemImage: "plus") {
-            let game = CodeWordBreaker()
-            initializeMasterCode(for: game)
-            withAnimation {
-                games.insert(game, at: 0)
-                sortGames()
+        Menu("New game", systemImage: "plus") {
+            ForEach(3...6, id: \.self) { numberOfLetters in
+                Button("^[\(numberOfLetters) letters](inflect: true)") {
+                    self.numberOfLetters = numberOfLetters
+                    createNewGame()
+                }
             }
-            path.append(game)
+        } primaryAction: {
+            createNewGame()
         }
+    }
+    
+    private func createNewGame() {
+        let game = CodeWordBreaker()
+        initializeMasterCode(for: game)
+        withAnimation {
+            games.insert(game, at: 0)
+            sortGames()
+        }
+        path.append(game)
     }
     
     private func initializeMasterCodes() {
@@ -78,11 +90,11 @@ struct GameChooser: View {
     
     private func initializeMasterCode(for game: CodeWordBreaker) {
         guard game.masterCode.hasMissingPegs else { return } // The master code has already been set
-        guard let word = words.random(length: game.masterCode.pegs.count) else {
+        guard let word = words.random(length: numberOfLetters) else {
             assertionFailure("Can't set master code: no words")
             return
         }
-        game.masterCode.word = word
+        game.restart(masterWord: word)
     }
     
     private func sortGames() {

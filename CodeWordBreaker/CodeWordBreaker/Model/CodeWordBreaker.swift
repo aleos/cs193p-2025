@@ -14,10 +14,10 @@ extension Peg {
 }
 
 @Observable final class CodeWordBreaker {
-    fileprivate static let defaultNumberOfPegs: Int = 5
+    static let defaultNumberOfLetters: Int = 5
     
-    var masterCode: Code = .init(kind: .master(isHidden: true), numberOfPegs: defaultNumberOfPegs)
-    var guess: Code = .init(kind: .guess, numberOfPegs: defaultNumberOfPegs)
+    var masterCode: Code = .init(kind: .master(isHidden: true), numberOfPegs: defaultNumberOfLetters)
+    var guess: Code = .init(kind: .guess, numberOfPegs: defaultNumberOfLetters)
     var attempts: [Code] = []
     private(set) var lastAppearedAt: Date?
     private(set) var lastAttemptedAt: Date?
@@ -35,7 +35,7 @@ extension Peg {
     }
     
     func restart(numberOfPegs: Int? = nil, masterWord: String? = nil) {
-        let numberOfPegs = numberOfPegs ?? masterCode.pegs.count
+        let numberOfPegs = numberOfPegs ?? masterWord?.count ?? masterCode.pegs.count
         masterCode = Code(kind: .master(isHidden: true), numberOfPegs: numberOfPegs)
         if let word = masterWord {
             masterCode.word = word
@@ -115,7 +115,7 @@ extension Array where Element == CodeWordBreaker {
     
     private static func makeAttempts(_ words: [String], in game: CodeWordBreaker) {
         for word in words {
-            var guess = Code(kind: .guess, numberOfPegs: CodeWordBreaker.defaultNumberOfPegs)
+            var guess = Code(kind: .guess, numberOfPegs: CodeWordBreaker.defaultNumberOfLetters)
             guess.word = word
             game.guess = guess
             game.attemptGuess()
