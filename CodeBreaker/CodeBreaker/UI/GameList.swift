@@ -14,7 +14,6 @@ struct GameList: View {
     // MARK: Data Owned by Me
     @State private var games: [CodeBreaker] = []
     
-    @State private var showGameEditor = false
     @State private var gameToEdit: CodeBreaker?
     
     var body: some View {
@@ -58,23 +57,16 @@ struct GameList: View {
         Button("Add game", systemImage: "plus") {
             gameToEdit = CodeBreaker(name: "Untitled", pegChoices: [.red, .blue])
         }
-        .onChange(of: gameToEdit) {
-            showGameEditor = gameToEdit != nil
-        }
-        .sheet(isPresented: $showGameEditor, onDismiss: { gameToEdit = nil }) {
-            gameEditor
-        }
+        .sheet(item: $gameToEdit, content: gameEditor)
     }
     
     @ViewBuilder
-    private var gameEditor: some View {
-        if let gameToEdit {
-            GameEditor(game: gameToEdit) { draft in
-                if let index = games.firstIndex(of: gameToEdit) {
-                    games[index] = draft
-                } else {
-                    games.insert(draft, at: 0)
-                }
+    private func gameEditor(game: CodeBreaker) -> some View {
+        GameEditor(game: game) { editedGame in
+            if let index = games.firstIndex(of: game) {
+                games[index] = editedGame
+            } else {
+                games.insert(editedGame, at: 0)
             }
         }
     }

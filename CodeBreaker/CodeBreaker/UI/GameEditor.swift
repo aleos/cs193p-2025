@@ -81,8 +81,8 @@ extension CodeBreaker {
         name: "Preview",
         pegChoices: [.orange, .purple]
     )
-    GameEditor(game: game) { draft in
-        print("game name changed to \(draft.name)")
-        print("game pegs changed to \(draft.pegChoices)")
+    GameEditor(game: game) { game in
+        print("game name changed to \(game.name)")
+        print("game pegs changed to \(game.pegChoices)")
     }
 }

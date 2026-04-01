@@ -39,7 +39,8 @@ struct Theme {
     }
 }
 
-@Observable class CodeBreaker {
+@Observable
+final class CodeBreaker {
     var name: String
     var masterCode: Code = .init(kind: .master(isHidden: true), numberOfPegs: 4)
     var guess: Code = .init(kind: .guess, numberOfPegs: 4)
@@ -55,7 +56,7 @@ struct Theme {
         let theme = Theme.named(name) ?? Theme.random()
         self.name = theme.name
         self.pegChoices = Array(theme.pegs.shuffled().prefix(6))
-        restart(numberOfPegs: pegChoices.count)
+        restart(numberOfPegs: 4)
     }
     
     init(name: String, pegChoices: [Peg]) {
