@@ -16,12 +16,17 @@ struct GameEditor: View {
     
     // MARK: Action Function
     var onChoose: () -> Void
-
+    
     var body: some View {
         NavigationStack {
             Form {
                 Section("Name") {
                     TextField("Name", text: $game.name)
+                        .autocapitalization(.words)
+                        .autocorrectionDisabled(false)
+                        .onSubmit {
+                            done()
+                        }
                 }
                 Section("Pegs") {
                     PegChoicesChooser(pegChoices: $game.pegChoices)
@@ -35,12 +40,16 @@ struct GameEditor: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Done") {
-                        onChoose()
-                        dismiss()
+                        done()
                     }
                 }
             }
         }
+    }
+    
+    private func done() {
+        onChoose()
+        dismiss()
     }
 }
 
