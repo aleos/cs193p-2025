@@ -11,20 +11,23 @@ struct GameEditor: View {
     // MARK: Data (Function) In
     @Environment(\.dismiss) var dismiss
     
-    // MARK: Data Shared with Me
-    @Bindable var game: CodeBreaker
-    
-    // MARK: Action Function
-    var onChoose: () -> Void
-    
+    // MARK: Data In
+    var onChoose: (CodeBreaker) -> Void
+
     // MARK: Data Owned by Me
+    @State private var draft: CodeBreaker
     @State private var showInvalidGameAlert = false
+
+    init(game: CodeBreaker, onChoose: @escaping (CodeBreaker) -> Void) {
+        self.onChoose = onChoose
+        self._draft = State(initialValue: CodeBreaker(name: game.name, pegChoices: game.pegChoices))
+    }
     
     var body: some View {
         NavigationStack {
             Form {
                 Section("Name") {
-                    TextField("Name", text: $game.name)
+                    TextField("Name", text: $draft.name)
                         .autocapitalization(.words)
                         .autocorrectionDisabled(false)
                         .onSubmit {
@@ -32,7 +35,7 @@ struct GameEditor: View {
                         }
                 }
                 Section("Pegs") {
-                    PegChoicesChooser(pegChoices: $game.pegChoices)
+                    PegChoicesChooser(pegChoices: $draft.pegChoices)
                 }
             }
             .toolbar {
@@ -58,8 +61,8 @@ struct GameEditor: View {
     }
     
     private func done() {
-        if game.isValid {
-            onChoose()
+        if draft.isValid {
+            onChoose(draft)
             dismiss()
         } else {
             showInvalidGameAlert = true
@@ -78,8 +81,8 @@ extension CodeBreaker {
         name: "Preview",
         pegChoices: [.orange, .purple]
     )
-    GameEditor(game: game) {
-        print("game name changed to \(game.name)")
-        print("game pegs changed to \(game.pegChoices)")
+    GameEditor(game: game) { draft in
+        print("game name changed to \(draft.name)")
+        print("game pegs changed to \(draft.pegChoices)")
     }
 }

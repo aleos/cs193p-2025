@@ -24,6 +24,7 @@ struct GameList: View {
                     GameSummary(game: game)
                 }
                 .contextMenu {
+                    editButton(for: game) // editing a game
                     deleteButton(for: game)
                 }
             }
@@ -42,9 +43,15 @@ struct GameList: View {
         .listStyle(.plain)
         .toolbar {
             addButton
-            EditButton()
+            EditButton() // editing the List of games
         }
         .onAppear(perform: addSampleGames)
+    }
+    
+    func editButton(for game: CodeBreaker) -> some View {
+        Button("Edit", systemImage: "pencil") {
+            gameToEdit = game
+        }
     }
     
     private var addButton: some View {
@@ -62,8 +69,12 @@ struct GameList: View {
     @ViewBuilder
     private var gameEditor: some View {
         if let gameToEdit {
-            GameEditor(game: gameToEdit) {
-                games.insert(gameToEdit, at: 0)
+            GameEditor(game: gameToEdit) { draft in
+                if let index = games.firstIndex(of: gameToEdit) {
+                    games[index] = draft
+                } else {
+                    games.insert(draft, at: 0)
+                }
             }
         }
     }
@@ -79,11 +90,8 @@ struct GameList: View {
     private func addSampleGames() {
         guard games.isEmpty else { return }
         games.append(.init(name: "Mastermind"))
-        games.append(.init(name: "Faces"))
-        games.append(.init(name: "Vehicles"))
-        games.append(.init(name: "Animals"))
-        games.append(.init(name: "Food"))
-        games.append(.init(name: "Sports"))
+        games.append(.init(name: "Earth Tones"))
+        games.append(.init(name: "Undersea"))
         selection = games.randomElement()
     }
 }
