@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct CodeBreakerView: View {
+    // MARK: Data In
+    @Environment(\.scenePhase) private var scenePhase
+    
     // MARK: Data Shared with Me
     let game: CodeBreaker
     
@@ -60,12 +63,7 @@ struct CodeBreakerView: View {
             }
         }
         .padding()
-        .onAppear {
-            game.startTimer()
-        }
-        .onDisappear {
-            game.pauseTimer()
-        }
+        .trackElapsedTime(in: game)
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button("Restart", systemImage: "arrow.circlepath") {
@@ -110,6 +108,43 @@ struct CodeBreakerView: View {
                 restarting = false
             }
         }
+    }
+}
+
+extension View {
+    func trackElapsedTime(in game: CodeBreaker) -> some View {
+        modifier(ElapsedTimeTracker(game: game))
+    }
+}
+
+struct ElapsedTimeTracker: ViewModifier {
+    // MARK: Data In
+    @Environment(\.scenePhase) private var scenePhase
+    let game: CodeBreaker
+    
+    func body(content: Content) -> some View {
+        content
+            .onAppear {
+                game.startTimer()
+            }
+            .onDisappear {
+                game.pauseTimer()
+            }
+            .onChange(of: game) { oldGame, newGame in
+                oldGame.pauseTimer()
+                newGame.startTimer()
+            }
+            .onChange(of: scenePhase) {
+                switch scenePhase {
+                case .background:
+                    game.pauseTimer()
+                case .active:
+                    game.startTimer()
+                default:
+                    break
+                }
+            }
+        
     }
 }
 
