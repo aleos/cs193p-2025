@@ -42,15 +42,23 @@ struct Theme {
     var masterCode: Code = .init(kind: .master(isHidden: true), numberOfPegs: 4)
     var guess: Code = .init(kind: .guess, numberOfPegs: 4)
     var attempts: [Code] = []
-    private(set) var selectedTheme = ""
     var pegChoices: [Peg] = []
     var startTime = Date.now
     var endTime: Date?
     
     var canAttemptGuess: Bool { !guess.pegs.isEmpty && !guess.hasMissingPegs && !attempts.contains { $0.pegs == guess.pegs } }
     
-    init(name: String = "Code Breaker") {
+    init(name: String = "Mastermind") {
         self.name = name
+        let theme = Theme.named(name) ?? Theme.random()
+        self.name = theme.name
+        self.pegChoices = Array(theme.pegs.shuffled().prefix(masterCode.pegs.count))
+        restart()
+    }
+    
+    init(name: String, pegChoices: [Peg]) {
+        self.name = name
+        self.pegChoices = pegChoices
         restart()
     }
     
@@ -60,9 +68,6 @@ struct Theme {
     
     func restart(numberOfPegs: Int? = nil) {
         let numberOfPegs = numberOfPegs ?? masterCode.pegs.count
-        let theme = Theme.named(name) ?? Theme.random()
-        self.selectedTheme = theme.name
-        self.pegChoices = Array(theme.pegs.shuffled().prefix(numberOfPegs))
         masterCode = Code(kind: .master(isHidden: true), numberOfPegs: numberOfPegs)
         masterCode.randomize(from: pegChoices)
         guess = Code(kind: .guess, numberOfPegs: numberOfPegs)

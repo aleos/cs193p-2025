@@ -1,0 +1,64 @@
+//
+//  PegChoicesChooser.swift
+//  CodeBreaker
+//
+//  Created by Alexander Ostrovsky on 1/4/2026.
+//
+
+import SwiftUI
+
+struct PegChoicesChooser: View {
+    // MARK: Data Shared with Me
+    @Binding var pegChoices: [Peg]
+
+    var body: some View {
+        List {
+            ForEach(pegChoices.indices, id: \.self) { index in
+                ColorPicker(
+                    selection: .init(
+                        get: { Color(name: pegChoices[index]) ?? .clear },
+                        set: { pegChoices[index] = $0.toHex() }
+                    ),
+                    supportsOpacity: false
+                ) {
+                    button("Peg Choice \(index + 1)", systemImage: "minus.circle", color: .red) {
+                        pegChoices.remove(at: index)
+                    }
+                }
+            }
+            button("Add Peg", systemImage: "plus.circle", color: .green) {
+                pegChoices.append(Color.green.toHex())
+            }
+        }
+    }
+    
+    private func button(
+        _ title: String,
+        systemImage: String,
+        color: Color? = nil,
+        action: @escaping () -> Void
+    ) -> some View {
+        HStack {
+            Button {
+                withAnimation {
+                    action()
+                }
+            } label: {
+                Image(systemName: systemImage)
+                    .tint(color)
+                    .imageScale(.large)
+            }
+            Text(title)
+        }
+    }
+}
+
+#Preview {
+    @Previewable @State var pegChoices: [Peg] = [
+        Color.teal.toHex(), "#00F000", "red", "yellow",
+    ]
+    PegChoicesChooser(pegChoices: $pegChoices)
+        .onChange(of: pegChoices) {
+            print("pegChoices = \(pegChoices)")
+        }
+}

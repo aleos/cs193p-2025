@@ -73,7 +73,7 @@ struct CodeBreakerView: View {
                     .fixedSize(horizontal: true, vertical: false)
             }
         }
-        .navigationTitle(game.selectedTheme)
+        .navigationTitle(game.name)
         .navigationBarTitleDisplayMode(.inline)
     }
     
