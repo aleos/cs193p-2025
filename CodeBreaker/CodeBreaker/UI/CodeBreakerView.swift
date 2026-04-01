@@ -60,6 +60,12 @@ struct CodeBreakerView: View {
             }
         }
         .padding()
+        .onAppear {
+            game.startTimer()
+        }
+        .onDisappear {
+            game.pauseTimer()
+        }
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button("Restart", systemImage: "arrow.circlepath") {
@@ -67,7 +73,7 @@ struct CodeBreakerView: View {
                 }
             }
             ToolbarItem {
-                ElapsedTime(startTime: game.startTime, endTime: game.endTime)
+                ElapsedTime(startTime: game.startTime, endTime: game.endTime, elapsedTime: game.elapsedTime)
                     .monospaced()
                     .lineLimit(1)
                     .fixedSize(horizontal: true, vertical: false)

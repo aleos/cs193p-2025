@@ -46,8 +46,9 @@ final class CodeBreaker {
     var guess: Code = .init(kind: .guess, numberOfPegs: 4)
     var attempts: [Code] = []
     var pegChoices: [Peg] = []
-    var startTime = Date.now
+    var startTime: Date?
     var endTime: Date?
+    var elapsedTime: TimeInterval = 0
     
     var canAttemptGuess: Bool { !guess.pegs.isEmpty && !guess.hasMissingPegs && !attempts.contains { $0.pegs == guess.pegs } }
     
@@ -65,6 +66,18 @@ final class CodeBreaker {
         restart()
     }
     
+    func startTimer() {
+        if startTime != nil, !isOver {
+            startTime = .now
+        }
+    }
+    
+    func pauseTimer() {
+        if let startTime {
+            elapsedTime += Date.now.timeIntervalSince(startTime)
+        }
+    }
+    
     var isOver: Bool {
         attempts.first?.pegs == masterCode.pegs
     }
@@ -77,6 +90,7 @@ final class CodeBreaker {
         attempts.removeAll()
         startTime = .now
         endTime = nil
+        elapsedTime = 0
     }
     
     func attemptGuess() {
@@ -88,6 +102,7 @@ final class CodeBreaker {
         if isOver {
             endTime = .now
             masterCode.kind = .master(isHidden: false)
+            pauseTimer()
         }
     }
     
