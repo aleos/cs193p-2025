@@ -42,6 +42,7 @@ struct GameEditor: View {
                     Button("Done") {
                         done()
                     }
+                    .disabled(!game.isValid)
                 }
             }
         }
@@ -50,6 +51,12 @@ struct GameEditor: View {
     private func done() {
         onChoose()
         dismiss()
+    }
+}
+
+extension CodeBreaker {
+    var isValid: Bool {
+        !name.isEmpty && Set(pegChoices).count >= 2
     }
 }
 
