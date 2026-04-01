@@ -18,7 +18,7 @@ struct Theme {
     var pegs: [Peg]
     
     static let all: [Theme] = [
-        Theme(name: "Mastermind", pegs: ["red", "green", "blue", "yellow", "orange", "purple"]),
+        Theme(name: "Mastermind", pegs: [.red, .green, .blue, .yellow, .orange, .purple]),
         Theme(name: "Faces", pegs: ["😀", "😂", "😍", "😎", "🤔", "😡"]),
         Theme(name: "Vehicles", pegs: ["🚗", "🚌", "🚲", "🚁", "🚀", "🚂"]),
         Theme(name: "Animals", pegs: ["🐶", "🐱", "🦊", "🐼", "🐸", "🐵"]),
@@ -26,7 +26,7 @@ struct Theme {
         Theme(name: "Sports", pegs: ["⚽️", "🏀", "🏈", "🎾", "🏐", "🏓"])
     ]
     
-    static let `default` = Theme(name: "Colors (classic)", pegs: ["red", "green", "blue", "yellow", "orange", "purple"])
+    static let `default` = Theme(name: "Colors (classic)", pegs: [.red, .green, .blue, .yellow, .orange, .purple])
     
     static func random() -> Theme {
         all.randomElement() ?? .default

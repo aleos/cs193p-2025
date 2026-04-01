@@ -14,6 +14,9 @@ struct GameList: View {
     // MARK: Data Owned by Me
     @State private var games: [CodeBreaker] = []
     
+    @State private var showGameEditor = false
+    @State private var gameToEdit: CodeBreaker?
+    
     var body: some View {
         List(selection: $selection) {
             ForEach(games) { game in
@@ -38,15 +41,31 @@ struct GameList: View {
         }
         .listStyle(.plain)
         .toolbar {
-            Button("Add game", systemImage: "plus") {
-                withAnimation {
-                    let newGame = CodeBreaker(name: "Mastermind")
-                    games.append(newGame)
-                }
-            }
+            addButton
             EditButton()
         }
         .onAppear(perform: addSampleGames)
+    }
+    
+    private var addButton: some View {
+        Button("Add game", systemImage: "plus") {
+            gameToEdit = CodeBreaker(name: "Untitled", pegChoices: [.red, .blue])
+        }
+        .onChange(of: gameToEdit) {
+            showGameEditor = gameToEdit != nil
+        }
+        .sheet(isPresented: $showGameEditor, onDismiss: { gameToEdit = nil }) {
+            gameEditor
+        }
+    }
+    
+    @ViewBuilder
+    private var gameEditor: some View {
+        if let gameToEdit {
+            GameEditor(game: gameToEdit) {
+                games.insert(gameToEdit, at: 0)
+            }
+        }
     }
     
     private func deleteButton(for game: CodeBreaker) -> some View {

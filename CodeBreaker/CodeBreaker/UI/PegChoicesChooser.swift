@@ -16,7 +16,7 @@ struct PegChoicesChooser: View {
             ForEach(pegChoices.indices, id: \.self) { index in
                 ColorPicker(
                     selection: .init(
-                        get: { Color(name: pegChoices[index]) ?? .clear },
+                        get: { Color(hex: pegChoices[index]) ?? .clear },
                         set: { pegChoices[index] = $0.toHex() }
                     ),
                     supportsOpacity: false
@@ -55,7 +55,7 @@ struct PegChoicesChooser: View {
 
 #Preview {
     @Previewable @State var pegChoices: [Peg] = [
-        Color.teal.toHex(), "#00F000", "red", "yellow",
+        .teal, "#00F000", .red, .yellow,
     ]
     PegChoicesChooser(pegChoices: $pegChoices)
         .onChange(of: pegChoices) {

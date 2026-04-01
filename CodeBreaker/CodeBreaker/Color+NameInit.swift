@@ -1,55 +1,26 @@
 import SwiftUI
 
-extension Color {
-    init?(name: String) {
-        switch name.lowercased() {
-        case "red":
-            self = .red
-        case "green":
-            self = .green
-        case "blue":
-            self = .blue
-        case "yellow":
-            self = .yellow
-        case "orange":
-            self = .orange
-        case "purple":
-            self = .purple
-        case "pink":
-            self = .pink
-        case "primary":
-            self = .primary
-        case "secondary":
-            self = .secondary
-        case "black":
-            self = .black
-        case "white":
-            self = .white
-        case "gray", "grey":
-            self = .gray
-        case "clear", "missing":
-            self = .clear
-        case "brown":
-            self = .brown
-        case "cyan":
-            self = .cyan
-        case "indigo":
-            self = .indigo
-        case "mint":
-            self = .mint
-        case "teal":
-            self = .teal
-        default:
-            if let hexColor = Color(hex: name) {
-                self = hexColor
-            } else {
-                return nil
-            }
-        }
-    }
+extension Peg {
+    static let red = Color.red.toHex()
+    static let green = Color.green.toHex()
+    static let blue = Color.blue.toHex()
+    static let yellow = Color.yellow.toHex()
+    static let orange = Color.orange.toHex()
+    static let purple = Color.purple.toHex()
+    static let pink = Color.pink.toHex()
+    static let black = Color.black.toHex()
+    static let white = Color.white.toHex()
+    static let gray = Color.gray.toHex()
+    static let brown = Color.brown.toHex()
+    static let cyan = Color.cyan.toHex()
+    static let indigo = Color.indigo.toHex()
+    static let mint = Color.mint.toHex()
+    static let teal = Color.teal.toHex()
+}
 
+extension Color {
     /// Parses a hex string like `"#FF5733"` or `"FF5733"` into a `Color`.
-    private init?(hex: String) {
+    init?(hex: String) {
         var hex = hex
         if hex.hasPrefix("#") { hex.removeFirst() }
         guard hex.count == 6, let rgb = UInt64(hex, radix: 16) else { return nil }
