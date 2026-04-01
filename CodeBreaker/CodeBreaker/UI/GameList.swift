@@ -26,6 +26,9 @@ struct GameList: View {
                     editButton(for: game) // editing a game
                     deleteButton(for: game)
                 }
+                .swipeActions(edge: .leading) {
+                    editButton(for: game).tint(.accentColor)
+                }
             }
             .onDelete { offsets in
                 games.remove(atOffsets: offsets)
