@@ -8,13 +8,16 @@
 import SwiftUI
 
 struct PegKeyboard: View {
+    // MARK: Data In
+    @Environment(\.settings) private var settings
+    
     // MARK: Data Out Function
     let onChoose: ((Peg) -> Void)?
-    let onRemove: (() -> Void)?
+    let onErase: (() -> Void)?
     let onGuess: (() -> Void)?
     var canGuess: Bool = true
     var bestResult: ((Peg) -> Match?)? = nil
-            
+    
     // MARK: - Body
     
     var body: some View {
@@ -31,32 +34,13 @@ struct PegKeyboard: View {
                     row(for: ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"], pegSize: pegSize)
                     row(for: ["A", "S", "D", "F", "G", "H", "J", "K", "L"], pegSize: pegSize)
                     HStack {
-                        Button(action: onGuess ?? {}) {
-                            PegView(peg: "⏎")
-                                .padding(Key.innerPadding)
-                                .background(
-                                    Key.shape.strokeBorder(Key.borderColor)
-                                        .background(Key.shape.foregroundStyle(Key.color))
-                                )
-                        }
-                        .tint(.primary)
-                        .disabled(!canGuess)
-                        .aspectRatio(Key.aspectRatio * 1.5, contentMode: .fit)
-                        .frame(width: pegSize * 1.5)
+                        guessButton
+                            .frame(width: pegSize * 1.5)
                         Spacer()
                         row(for: ["Z", "X", "C", "V", "B", "N", "M"], pegSize: pegSize)
                         Spacer()
-                        Button(action: onRemove ?? {}) {
-                            PegView(peg: "⌫")
-                                .padding(Key.innerPadding)
-                                .background(
-                                    Key.shape.strokeBorder(Key.borderColor)
-                                        .background(Key.shape.foregroundStyle(Key.color))
-                                )
-                        }
-                        .tint(.primary)
-                        .aspectRatio(Key.aspectRatio * 1.5, contentMode: .fit)
-                        .frame(width: pegSize * 1.5)
+                        eraseButton
+                            .frame(width: pegSize * 1.5)
                     }
                 }
             }
@@ -71,18 +55,51 @@ struct PegKeyboard: View {
         }
     }
     
+    private var guessButton: some View {
+        Button(action: onGuess ?? {}) {
+            PegView(peg: "⏎")
+                .padding(Key.innerPadding)
+                .background(
+                    Key.shape.strokeBorder(Key.borderColor)
+                        .background(Key.shape.foregroundStyle(Key.color))
+                )
+        }
+        .tint(.primary)
+        .disabled(!canGuess)
+        .aspectRatio(Key.aspectRatio * 1.5, contentMode: .fit)
+    }
+    
+    private var eraseButton: some View {
+        Button(action: onErase ?? {}) {
+            PegView(peg: "⌫")
+                .padding(Key.innerPadding)
+                .background(
+                    Key.shape.strokeBorder(Key.borderColor)
+                        .background(Key.shape.foregroundStyle(Key.color))
+                )
+        }
+        .tint(.primary)
+        .aspectRatio(Key.aspectRatio * 1.5, contentMode: .fit)
+    }
+    
     func row(for choices: [Peg], pegSize: CGFloat) -> some View {
         HStack(spacing: Key.spacing) {
             ForEach(choices, id: \.self) { peg in
                 Button {
                     onChoose?(peg)
                 } label: {
-                    let keyColor = bestResult?(peg)?.color.opacity(0.5) ?? Key.color
+                    let keyColor = bestResult?(peg).flatMap(settings.color)?.opacity(0.5)
                     PegView(peg: peg)
                         .padding(Key.innerPadding)
                         .background(
                             Key.shape.strokeBorder(Key.borderColor)
-                                .background(Key.shape.foregroundStyle(keyColor))
+                                .background {
+                                    if let keyColor {
+                                        Key.shape.foregroundStyle(keyColor)
+                                    } else {
+                                        Key.shape.foregroundStyle(Key.color)
+                                    }
+                                }
                         )
                 }
                 .tint(.primary)
@@ -101,10 +118,10 @@ fileprivate struct Key {
     static let maxNumber = 10
     static let rowCount = 3
     static let borderColor: Color = Color.gray(0.85)
-    static let color: Color = Color.gray(0.98)
+    static let color: BackgroundStyle = .background
 }
 
 #Preview {
     @Previewable @State var selection: Int = 0
-    PegKeyboard(onChoose: { print("Choose \($0)") }, onRemove: { print("Backspace") }, onGuess: { print("Guess") }, bestResult: nil)
+    PegKeyboard(onChoose: { print("Choose \($0)") }, onErase: { print("Backspace") }, onGuess: { print("Guess") }, bestResult: nil)
 }

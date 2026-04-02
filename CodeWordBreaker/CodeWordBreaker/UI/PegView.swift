@@ -24,6 +24,7 @@ struct PegView: View {
 #Preview {
     VStack {
         PegView(peg: "A")
+        PegView(peg: Peg.missing)
     }
     .padding()
 }

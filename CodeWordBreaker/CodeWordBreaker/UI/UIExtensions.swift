@@ -54,12 +54,67 @@ extension Color {
     }
 }
 
-extension Match {
-    var color: Color {
-        switch self {
-        case .exact: .green
-        case .inexact: .yellow
-        case .nomatch: .gray
-        }
+extension Color {
+    init(_ hex: UInt, alpha: Double = 1) {
+        self.init(
+            .sRGB,
+            red: Double((hex >> 16) & 0xFF) / 255,
+            green: Double((hex >> 8) & 0xFF) / 255,
+            blue: Double(hex & 0xFF) / 255,
+            opacity: alpha
+        )
+    }
+
+    init?(hex: String) {
+        guard hex.hasPrefix("#"), hex.count == 7,
+              let value = UInt(hex.dropFirst(), radix: 16) else { return nil }
+        self.init(value)
+    }
+
+    var hex: String { UIColor(self).hex }
+}
+
+extension UIColor {
+    var hex: String {
+        var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
+        getRed(&r, green: &g, blue: &b, alpha: &a)
+        return String(format: "#%02X%02X%02X", Int((r * 255).rounded()), Int((g * 255).rounded()), Int((b * 255).rounded()))
+    }
+}
+
+extension View {
+    func trackElapsedTime(in game: CodeWordBreaker) -> some View {
+        modifier(ElapsedTimeTracker(game: game))
+    }
+}
+
+struct ElapsedTimeTracker: ViewModifier {
+    // MARK: Data In
+    @Environment(\.scenePhase) private var scenePhase
+    let game: CodeWordBreaker
+    
+    func body(content: Content) -> some View {
+        content
+            .onAppear {
+                game.resume()
+            }
+            .onDisappear {
+                game.pause()
+            }
+            .onChange(of: game) { oldGame, newGame in
+                oldGame.pause()
+                newGame.resume()
+            }
+            .onChange(of: scenePhase) {
+                switch scenePhase {
+                case .background:
+                    game.pause()
+                case .active:
+                    game.resume()
+                default:
+                    break
+                }
+            }
+        
     }
 }

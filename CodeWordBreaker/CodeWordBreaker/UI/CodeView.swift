@@ -9,6 +9,7 @@ import SwiftUI
 
 struct CodeView<AncillaryView>: View where AncillaryView: View {
     // MARK: Data In
+    @Environment(\.settings) var settings
     let code: Code
     
     // MARK: Data Shared with Me
@@ -91,13 +92,18 @@ struct CodeView<AncillaryView>: View where AncillaryView: View {
             }
         }
     }
-
+    
     @ViewBuilder
     private func pegBackground(for index: Int) -> some View {
         switch code.kind {
         case .attempt(let matches):
-            Selection.shape
-                .foregroundStyle(matches[index].color)
+            if code.hasMissingPegs {
+                Selection.shape
+                    .strokeBorder(.gray)
+            } else {
+                Selection.shape
+                    .foregroundStyle(settings.color(for: matches[index]))
+            }
         default:
             EmptyView()
         }
@@ -119,4 +125,5 @@ fileprivate struct Selection {
     @Previewable @State var selection: Int = 0
     CodeView(code: .init(kind: .guess, numberOfPegs: 4), selection: $selection) { Color.teal }
     CodeView(code: .init(kind: .guess, numberOfPegs: 4), selection: $selection)
+    CodeView(code: .init(kind: .attempt(Array(repeating: .nomatch, count: 4)), numberOfPegs: 4))
 }

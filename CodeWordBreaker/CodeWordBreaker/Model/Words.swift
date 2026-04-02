@@ -12,7 +12,7 @@ extension EnvironmentValues {
 }
 
 @Observable
-class Words {
+final class Words {
     private var words = Dictionary<Int, Set<String>>()
     
     static let shared =
