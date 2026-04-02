@@ -88,12 +88,18 @@ struct PegKeyboard: View {
                 Button {
                     onChoose?(peg)
                 } label: {
-                    let keyColor = bestResult?(peg).flatMap(settings.color)?.opacity(0.5) ?? Key.color
+                    let keyColor = bestResult?(peg).flatMap(settings.color)?.opacity(0.5)
                     PegView(peg: peg)
                         .padding(Key.innerPadding)
                         .background(
                             Key.shape.strokeBorder(Key.borderColor)
-                                .background(Key.shape.foregroundStyle(keyColor))
+                                .background {
+                                    if let keyColor {
+                                        Key.shape.foregroundStyle(keyColor)
+                                    } else {
+                                        Key.shape.foregroundStyle(Key.color)
+                                    }
+                                }
                         )
                 }
                 .tint(.primary)
@@ -112,7 +118,7 @@ fileprivate struct Key {
     static let maxNumber = 10
     static let rowCount = 3
     static let borderColor: Color = Color.gray(0.85)
-    static let color: Color = Color.gray(0.98)
+    static let color: BackgroundStyle = .background
 }
 
 #Preview {

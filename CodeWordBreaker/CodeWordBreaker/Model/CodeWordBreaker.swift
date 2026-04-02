@@ -20,10 +20,10 @@ final class CodeWordBreaker {
     var masterCode: Code = .init(kind: .master(isHidden: true), numberOfPegs: defaultNumberOfLetters)
     var guess: Code = .init(kind: .guess, numberOfPegs: defaultNumberOfLetters)
     var attempts: [Code] = []
-    private(set) var lastAppearedAt: Date?
-    private(set) var lastAttemptedAt: Date?
-    private(set) var accumulatedTime: TimeInterval = 0
+    private(set) var startTime: Date?
+    private(set) var elapsedTime: TimeInterval = 0
     private(set) var endTime: Date?
+    private(set) var lastAttemptedAt: Date?
     
     var canAttemptGuess: Bool { !guess.pegs.isEmpty && !guess.hasMissingPegs && !attempts.contains { $0.pegs == guess.pegs } }
     
@@ -77,13 +77,13 @@ final class CodeWordBreaker {
     
     func resume() {
         guard endTime == nil else { return }
-        lastAppearedAt = .now
+        startTime = .now
     }
     
     func pause() {
-        guard let lastAppearedAt else { return }
-        self.lastAppearedAt = nil
-        accumulatedTime += Date.now.timeIntervalSince(lastAppearedAt)
+        guard let startTime else { return }
+        self.startTime = nil
+        elapsedTime += Date.now.timeIntervalSince(startTime)
     }
 }
 

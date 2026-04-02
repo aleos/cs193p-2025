@@ -39,23 +39,23 @@ struct CodeWordBreakerView: View {
             if !game.isOver {
                 PegKeyboard(onChoose: changePegAtSelection, onErase: removePegAtSelection, onGuess: guess, canGuess: game.canAttemptGuess, bestResult: game.bestResult)
                     .padding()
-                    .background(.background)
-                    .clipShape(.rect(cornerRadius: 16))
-                    .ignoresSafeArea(.all, edges: .bottom)
+                    .background {
+                        Rectangle()
+                            .clipShape(.rect(cornerRadius: 16))
+                            .foregroundStyle(.background)
+                            .ignoresSafeArea(.all, edges: .bottom)
+                    }
                     .transition(.pegChooser)
             }
         }
         .padding(.top)
-        .onAppear(perform: game.resume)
-        .onDisappear(perform: game.pause)
+        .trackElapsedTime(in: game)
         .toolbar {
-            if let lastAppearedAt = game.lastAppearedAt {
-                ToolbarItem {
-                    ElapsedTime(startTime: lastAppearedAt.addingTimeInterval(-game.accumulatedTime), endTime: game.endTime)
-                        .monospaced()
-                        .lineLimit(1)
-                        .fixedSize(horizontal: true, vertical: false)
-                }
+            ToolbarItem {
+                ElapsedTime(startTime: game.startTime, endTime: game.endTime, elapsedTime: game.elapsedTime)
+                    .monospaced()
+                    .lineLimit(1)
+                    .fixedSize(horizontal: true, vertical: false)
             }
         }
         .navigationBarTitleDisplayMode(.inline)
