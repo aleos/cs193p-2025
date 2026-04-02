@@ -16,7 +16,7 @@ struct PegView: View {
     let pegShape = Circle()
     
     var body: some View {
-        let pegColor = Color(name: peg)
+        let pegColor = Color(hex: peg)
         pegShape
             .foregroundStyle(pegColor ?? .clear)
             .contentShape(pegShape)
@@ -33,6 +33,6 @@ struct PegView: View {
 }
 
 #Preview {
-    PegView(peg: "teal")
+    PegView(peg: .teal)
         .padding()
 }
