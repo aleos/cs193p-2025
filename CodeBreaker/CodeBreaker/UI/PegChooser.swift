@@ -31,5 +31,5 @@ struct PegChooser: View {
 
 #Preview {
     @Previewable @State var selection: Int = 0
-    PegChooser(choices: ["blue", "green", "yellow"], onChoose: nil)
+    PegChooser(choices: [.blue, .green, .yellow], onChoose: nil)
 }

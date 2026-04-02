@@ -14,6 +14,8 @@ struct GameList: View {
     // MARK: Data Owned by Me
     @State private var games: [CodeBreaker] = []
     
+    @State private var gameToEdit: CodeBreaker?
+    
     var body: some View {
         List(selection: $selection) {
             ForEach(games) { game in
@@ -21,7 +23,11 @@ struct GameList: View {
                     GameSummary(game: game)
                 }
                 .contextMenu {
+                    editButton(for: game) // editing a game
                     deleteButton(for: game)
+                }
+                .swipeActions(edge: .leading) {
+                    editButton(for: game).tint(.accentColor)
                 }
             }
             .onDelete { offsets in
@@ -38,15 +44,34 @@ struct GameList: View {
         }
         .listStyle(.plain)
         .toolbar {
-            Button("Add game", systemImage: "plus") {
-                withAnimation {
-                    let newGame = CodeBreaker(name: "Mastermind")
-                    games.append(newGame)
-                }
-            }
-            EditButton()
+            addButton
+            EditButton() // editing the List of games
         }
         .onAppear(perform: addSampleGames)
+    }
+    
+    func editButton(for game: CodeBreaker) -> some View {
+        Button("Edit", systemImage: "pencil") {
+            gameToEdit = game
+        }
+    }
+    
+    private var addButton: some View {
+        Button("Add game", systemImage: "plus") {
+            gameToEdit = CodeBreaker(name: "Untitled", pegChoices: [.red, .blue])
+        }
+        .sheet(item: $gameToEdit, content: gameEditor)
+    }
+    
+    @ViewBuilder
+    private func gameEditor(game: CodeBreaker) -> some View {
+        GameEditor(game: game) { editedGame in
+            if let index = games.firstIndex(of: game) {
+                games[index] = editedGame
+            } else {
+                games.insert(editedGame, at: 0)
+            }
+        }
     }
     
     private func deleteButton(for game: CodeBreaker) -> some View {
@@ -60,11 +85,8 @@ struct GameList: View {
     private func addSampleGames() {
         guard games.isEmpty else { return }
         games.append(.init(name: "Mastermind"))
-        games.append(.init(name: "Faces"))
-        games.append(.init(name: "Vehicles"))
-        games.append(.init(name: "Animals"))
-        games.append(.init(name: "Food"))
-        games.append(.init(name: "Sports"))
+        games.append(.init(name: "Earth Tones"))
+        games.append(.init(name: "Undersea"))
         selection = games.randomElement()
     }
 }

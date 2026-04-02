@@ -18,7 +18,9 @@ struct Theme {
     var pegs: [Peg]
     
     static let all: [Theme] = [
-        Theme(name: "Mastermind", pegs: ["red", "green", "blue", "yellow", "orange", "purple"]),
+        Theme(name: "Mastermind", pegs: [.red, .blue, .green, .yellow]),
+        Theme(name: "Earth Tones", pegs: [.orange, .brown, .black, .yellow, .green]),
+        Theme(name: "Undersea", pegs: [.blue, .purple, .teal]),
         Theme(name: "Faces", pegs: ["😀", "😂", "😍", "😎", "🤔", "😡"]),
         Theme(name: "Vehicles", pegs: ["🚗", "🚌", "🚲", "🚁", "🚀", "🚂"]),
         Theme(name: "Animals", pegs: ["🐶", "🐱", "🦊", "🐼", "🐸", "🐵"]),
@@ -26,7 +28,7 @@ struct Theme {
         Theme(name: "Sports", pegs: ["⚽️", "🏀", "🏈", "🎾", "🏐", "🏓"])
     ]
     
-    static let `default` = Theme(name: "Colors (classic)", pegs: ["red", "green", "blue", "yellow", "orange", "purple"])
+    static let `default` = Theme(name: "Colors (classic)", pegs: [.red, .green, .blue, .yellow, .orange, .purple])
     
     static func random() -> Theme {
         all.randomElement() ?? .default
@@ -37,21 +39,43 @@ struct Theme {
     }
 }
 
-@Observable class CodeBreaker {
+@Observable
+final class CodeBreaker {
     var name: String
     var masterCode: Code = .init(kind: .master(isHidden: true), numberOfPegs: 4)
     var guess: Code = .init(kind: .guess, numberOfPegs: 4)
     var attempts: [Code] = []
-    private(set) var selectedTheme = ""
     var pegChoices: [Peg] = []
-    var startTime = Date.now
+    var startTime: Date?
     var endTime: Date?
+    var elapsedTime: TimeInterval = 0
     
     var canAttemptGuess: Bool { !guess.pegs.isEmpty && !guess.hasMissingPegs && !attempts.contains { $0.pegs == guess.pegs } }
     
-    init(name: String = "Code Breaker") {
+    init(name: String = "Mastermind") {
         self.name = name
+        let theme = Theme.named(name) ?? Theme.random()
+        self.name = theme.name
+        self.pegChoices = Array(theme.pegs.shuffled().prefix(6))
+        restart(numberOfPegs: 4)
+    }
+    
+    init(name: String, pegChoices: [Peg]) {
+        self.name = name
+        self.pegChoices = pegChoices
         restart()
+    }
+    
+    func startTimer() {
+        if startTime != nil, !isOver {
+            startTime = .now
+        }
+    }
+    
+    func pauseTimer() {
+        if let startTime {
+            elapsedTime += Date.now.timeIntervalSince(startTime)
+        }
     }
     
     var isOver: Bool {
@@ -60,15 +84,13 @@ struct Theme {
     
     func restart(numberOfPegs: Int? = nil) {
         let numberOfPegs = numberOfPegs ?? masterCode.pegs.count
-        let theme = Theme.named(name) ?? Theme.random()
-        self.selectedTheme = theme.name
-        self.pegChoices = Array(theme.pegs.shuffled().prefix(numberOfPegs))
         masterCode = Code(kind: .master(isHidden: true), numberOfPegs: numberOfPegs)
         masterCode.randomize(from: pegChoices)
         guess = Code(kind: .guess, numberOfPegs: numberOfPegs)
         attempts.removeAll()
         startTime = .now
         endTime = nil
+        elapsedTime = 0
     }
     
     func attemptGuess() {
@@ -80,6 +102,7 @@ struct Theme {
         if isOver {
             endTime = .now
             masterCode.kind = .master(isHidden: false)
+            pauseTimer()
         }
     }
     
