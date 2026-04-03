@@ -6,12 +6,7 @@
 //
 
 import Foundation
-
-typealias Peg = String
-
-extension Peg {
-    static let missing = ""
-}
+import SwiftData
 
 @Observable
 final class CodeBreaker {
