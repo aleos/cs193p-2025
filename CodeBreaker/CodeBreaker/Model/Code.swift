@@ -77,3 +77,29 @@ struct Code {
         }
     }
 }
+
+extension Code.Kind: RawRepresentable {
+    var rawValue: String {
+        switch self {
+        case .master(let isHidden): "master:\(isHidden)"
+        case .guess: "guess"
+        case .attempt(let matches): "attempt:" + matches.map(\.rawValue).joined(separator: ",")
+        case .unknown: "unknown"
+        }
+    }
+    
+    init?(rawValue: String) {
+        let parts = rawValue.split(separator: ":", maxSplits: 1)
+        switch parts.first.map(String.init) {
+        case "master":
+            self = .master(isHidden: parts.last == "true")
+        case "guess":
+            self = .guess
+        case "attempt":
+            let matches = parts.last?.split(separator: ",").compactMap { Code.Match(rawValue: String($0)) } ?? []
+            self = .attempt(matches)
+        default:
+            self = .unknown
+        }
+    }
+}
