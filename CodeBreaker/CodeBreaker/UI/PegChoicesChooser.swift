@@ -17,7 +17,7 @@ struct PegChoicesChooser: View {
                 ColorPicker(
                     selection: .init(
                         get: { Color(hex: pegChoices[index]) ?? .clear },
-                        set: { pegChoices[index] = $0.toHex() }
+                        set: { pegChoices[index] = $0.hex }
                     ),
                     supportsOpacity: false
                 ) {
@@ -27,7 +27,7 @@ struct PegChoicesChooser: View {
                 }
             }
             button("Add Peg", systemImage: "plus.circle", color: .green) {
-                pegChoices.append(Color.green.toHex())
+                pegChoices.append(Color.green.hex)
             }
         }
     }
@@ -55,7 +55,7 @@ struct PegChoicesChooser: View {
 
 #Preview {
     @Previewable @State var pegChoices: [Peg] = [
-        .teal, "#00F000", .red, .yellow,
+        Color.teal.hex, "#00F000", Color.red.hex, Color.yellow.hex,
     ]
     PegChoicesChooser(pegChoices: $pegChoices)
         .onChange(of: pegChoices) {
