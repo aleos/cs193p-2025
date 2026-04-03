@@ -18,6 +18,10 @@ struct Code {
         case unknown
     }
     
+    enum Match: String {
+        case nomatch, exact, inexact
+    }
+    
     var hasMissingPegs: Bool { pegs.contains { $0 == Peg.missing } }
     
     init(kind: Kind, numberOfPegs: Int) {

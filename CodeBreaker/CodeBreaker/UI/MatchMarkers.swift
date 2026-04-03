@@ -7,13 +7,9 @@
 
 import SwiftUI
 
-enum Match {
-    case nomatch, exact, inexact
-}
-
 struct MatchMarkers: View {
     // MARK: Data In
-    let matches: [Match]
+    let matches: [Code.Match]
     
     // MARK: - Body
     
@@ -41,7 +37,7 @@ struct MatchMarkers: View {
 }
 
 #Preview {
-    let configurations: [[Match]] = [
+    let configurations: [[Code.Match]] = [
         [.exact, .inexact, .inexact],
         [.exact, .nomatch, .nomatch],
         [.exact, .inexact, .inexact, .exact, .nomatch],
@@ -63,7 +59,7 @@ struct MatchMarkers: View {
 }
 
 struct MatchMarkersPreview: View {
-    let matches: [Match]
+    let matches: [Code.Match]
     var body: some View {
         HStack {
             ForEach(1...matches.count, id: \.self) {_ in
