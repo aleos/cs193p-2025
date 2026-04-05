@@ -28,6 +28,6 @@ struct GameChooser: View {
     }
 }
 
-#Preview {
+#Preview(traits: .swiftData) {
     GameChooser()
 }
