@@ -6,11 +6,22 @@
 //
 
 import Foundation
+import SwiftData
 
-struct Code {
-    var kind: Kind
+@Model
+final class Code {
+    var _kind: String
+    var kind: Kind {
+        get { .init(rawValue: _kind) ?? .unknown }
+        set { _kind = newValue.rawValue }
+    }
     var pegs: [Peg]
-        
+    
+    init(kind: Kind, pegs: [Peg] = Array<Peg>(repeating: .missing, count: 4)) {
+        self._kind = kind.rawValue
+        self.pegs = pegs
+    }
+    
     enum Kind: Equatable {
         case master(isHidden: Bool)
         case guess
@@ -25,11 +36,11 @@ struct Code {
     var hasMissingPegs: Bool { pegs.contains { $0 == Peg.missing } }
     
     init(kind: Kind, numberOfPegs: Int) {
-        self.kind = kind
+        self._kind = kind.rawValue
         self.pegs = Array(repeating: Peg.missing, count: numberOfPegs)
     }
     
-    mutating func randomize(from pegChoices: [Peg]) {
+    func randomize(from pegChoices: [Peg]) {
         for index in pegs.indices {
             pegs[index] = pegChoices.randomElement() ?? Peg.missing
         }
@@ -43,7 +54,7 @@ struct Code {
         }
     }
     
-    mutating func reset() {
+    func reset() {
         pegs = Array(repeating: Peg.missing, count: pegs.count)
     }
     
