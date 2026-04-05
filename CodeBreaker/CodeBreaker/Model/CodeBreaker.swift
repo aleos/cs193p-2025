@@ -38,6 +38,9 @@ final class CodeBreaker {
     func startTimer() {
         if startTime != nil, !isOver {
             startTime = .now
+            // Nudge a persisted property so SwiftData triggers a UI update
+            // (@Transient startTime changes aren't observed)
+            elapsedTime += 0.00001
         }
     }
     
