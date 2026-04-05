@@ -9,16 +9,13 @@ import SwiftUI
 
 struct PegChoicesChooser: View {
     // MARK: Data Shared with Me
-    @Binding var pegChoices: [Peg]
+    @Binding var pegChoices: [Color]
 
     var body: some View {
         List {
             ForEach(pegChoices.indices, id: \.self) { index in
                 ColorPicker(
-                    selection: .init(
-                        get: { Color(hex: pegChoices[index]) ?? .clear },
-                        set: { pegChoices[index] = $0.hex }
-                    ),
+                    selection: $pegChoices[index],
                     supportsOpacity: false
                 ) {
                     button("Peg Choice \(index + 1)", systemImage: "minus.circle", color: .red) {
@@ -27,7 +24,7 @@ struct PegChoicesChooser: View {
                 }
             }
             button("Add Peg", systemImage: "plus.circle", color: .green) {
-                pegChoices.append(Color.green.hex)
+                pegChoices.append(.green)
             }
         }
     }
@@ -54,8 +51,8 @@ struct PegChoicesChooser: View {
 }
 
 #Preview {
-    @Previewable @State var pegChoices: [Peg] = [
-        Color.teal.hex, "#00F000", Color.red.hex, Color.yellow.hex,
+    @Previewable @State var pegChoices: [Color] = [
+        .teal, .init("#00F000"), .red, .yellow,
     ]
     PegChoicesChooser(pegChoices: $pegChoices)
         .onChange(of: pegChoices) {

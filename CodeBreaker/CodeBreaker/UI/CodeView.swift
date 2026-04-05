@@ -74,12 +74,6 @@ fileprivate struct Selection {
     static let shape = RoundedRectangle(cornerRadius: cornerRadius)
 }
 
-extension CodeBreaker {
-    convenience init(name: String = "Code Breaker", pegChoices: [Color]) {
-        self.init(name: name, pegChoices: pegChoices.map(\.hex))
-    }
-}
-
 #Preview {
     @Previewable @State var selection: Int = 0
     CodeView(code: .init(kind: .guess, numberOfPegs: 4), selection: $selection) { Color.teal }
