@@ -6,47 +6,16 @@
 //
 
 import Foundation
+import SwiftData
 
-typealias Peg = String
-
-extension Peg {
-    static let missing = ""
-}
-
-struct Theme {
-    var name: String
-    var pegs: [Peg]
-    
-    static let all: [Theme] = [
-        Theme(name: "Mastermind", pegs: [.red, .blue, .green, .yellow]),
-        Theme(name: "Earth Tones", pegs: [.orange, .brown, .black, .yellow, .green]),
-        Theme(name: "Undersea", pegs: [.blue, .purple, .teal]),
-        Theme(name: "Faces", pegs: ["😀", "😂", "😍", "😎", "🤔", "😡"]),
-        Theme(name: "Vehicles", pegs: ["🚗", "🚌", "🚲", "🚁", "🚀", "🚂"]),
-        Theme(name: "Animals", pegs: ["🐶", "🐱", "🦊", "🐼", "🐸", "🐵"]),
-        Theme(name: "Food", pegs: ["🍎", "🍔", "🍣", "🍕", "🍩", "🍇"]),
-        Theme(name: "Sports", pegs: ["⚽️", "🏀", "🏈", "🎾", "🏐", "🏓"])
-    ]
-    
-    static let `default` = Theme(name: "Colors (classic)", pegs: [.red, .green, .blue, .yellow, .orange, .purple])
-    
-    static func random() -> Theme {
-        all.randomElement() ?? .default
-    }
-    
-    static func named(_ name: String) -> Theme? {
-        all.first { $0.name == name }
-    }
-}
-
-@Observable
+@Model
 final class CodeBreaker {
     var name: String
-    var masterCode: Code = .init(kind: .master(isHidden: true), numberOfPegs: 4)
-    var guess: Code = .init(kind: .guess, numberOfPegs: 4)
-    var attempts: [Code] = []
+    @Relationship(deleteRule: .cascade) var masterCode: Code = Code(kind: .master(isHidden: true), numberOfPegs: 4)
+    @Relationship(deleteRule: .cascade) var guess: Code = Code(kind: .guess, numberOfPegs: 4)
+    @Relationship(deleteRule: .cascade) var attempts: [Code] = []
     var pegChoices: [Peg] = []
-    var startTime: Date?
+    @Transient var startTime: Date?
     var endTime: Date?
     var elapsedTime: TimeInterval = 0
     
@@ -95,8 +64,7 @@ final class CodeBreaker {
     
     func attemptGuess() {
         guard canAttemptGuess else { return }
-        var attempt = guess
-        attempt.kind = .attempt(guess.match(against: masterCode))
+        let attempt = Code(kind: .attempt(guess.match(against: masterCode)), pegs: guess.pegs)
         attempts.insert(attempt, at: 0)
         guess.reset()
         if isOver {
@@ -119,15 +87,5 @@ final class CodeBreaker {
         } else {
             guess.pegs[index] = pegChoices.first ?? Peg.missing
         }
-    }
-}
-
-extension CodeBreaker: Identifiable, Hashable {
-    static func == (lhs: CodeBreaker, rhs: CodeBreaker) -> Bool {
-        lhs.id == rhs.id
-    }
-    
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
     }
 }

@@ -35,7 +35,7 @@ struct GameEditor: View {
                         }
                 }
                 Section("Pegs") {
-                    PegChoicesChooser(pegChoices: $draft.pegChoices)
+                    PegChoicesChooser(pegChoices: $draft.pegColorChoices)
                 }
             }
             .toolbar {

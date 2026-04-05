@@ -33,6 +33,6 @@ struct PegView: View {
 }
 
 #Preview {
-    PegView(peg: .teal)
+    PegView(peg: Color.teal.hex)
         .padding()
 }
