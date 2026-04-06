@@ -160,7 +160,7 @@ extension CodeBreaker {
 }
 
 
-#Preview {
+#Preview(traits: .swiftData) {
     @Previewable let game = CodeBreaker()
     NavigationStack {
         CodeBreakerView(game: game)

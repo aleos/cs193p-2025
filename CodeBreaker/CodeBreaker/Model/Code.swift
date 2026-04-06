@@ -16,6 +16,7 @@ final class Code {
         set { _kind = newValue.rawValue }
     }
     var pegs: [Peg]
+    var timestamp = Date.now
     
     init(kind: Kind, pegs: [Peg] = Array<Peg>(repeating: .missing, count: 4)) {
         self._kind = kind.rawValue

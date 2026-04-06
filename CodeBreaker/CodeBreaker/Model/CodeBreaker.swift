@@ -13,11 +13,17 @@ final class CodeBreaker {
     var name: String
     @Relationship(deleteRule: .cascade) var masterCode: Code = Code(kind: .master(isHidden: true), numberOfPegs: 4)
     @Relationship(deleteRule: .cascade) var guess: Code = Code(kind: .guess, numberOfPegs: 4)
-    @Relationship(deleteRule: .cascade) var attempts: [Code] = []
+    @Relationship(deleteRule: .cascade) var _attempts: [Code] = []
     var pegChoices: [Peg] = []
     @Transient var startTime: Date?
     var endTime: Date?
     var elapsedTime: TimeInterval = 0
+    var lastAttemptDate = Date.now
+    
+    var attempts: [Code] {
+        get { _attempts.sorted { $0.timestamp > $1.timestamp } }
+        set { _attempts = newValue }
+    }
     
     var canAttemptGuess: Bool { !guess.pegs.isEmpty && !guess.hasMissingPegs && !attempts.contains { $0.pegs == guess.pegs } }
     
@@ -36,8 +42,11 @@ final class CodeBreaker {
     }
     
     func startTimer() {
-        if startTime != nil, !isOver {
+        if !isOver {
             startTime = .now
+            // Nudge a persisted property so SwiftData triggers a UI update
+            // (@Transient startTime changes aren't observed)
+            elapsedTime += 0.00001
         }
     }
     
@@ -66,6 +75,7 @@ final class CodeBreaker {
         guard canAttemptGuess else { return }
         let attempt = Code(kind: .attempt(guess.match(against: masterCode)), pegs: guess.pegs)
         attempts.insert(attempt, at: 0)
+        lastAttemptDate = .now
         guess.reset()
         if isOver {
             endTime = .now

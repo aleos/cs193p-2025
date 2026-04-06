@@ -20,7 +20,7 @@ struct GameSummary: View {
     }
 }
 
-#Preview {
+#Preview(traits: .swiftData) {
     List {
         GameSummary(game: .init(name: "Mastermind"))
     }
