@@ -5,15 +5,18 @@
 //  Created by Alexander Ostrovsky on 1/4/2026.
 //
 
+import SwiftData
 import SwiftUI
 
 struct GameList: View {
+    // MARK: Data In
+    @Environment(\.modelContext) var modelContext
+    
     // MARK: Data Shared with Me
     @Binding var selection: CodeBreaker?
+    @Query(sort: \CodeBreaker.name, order: .forward) private var games: [CodeBreaker]
     
     // MARK: Data Owned by Me
-    @State private var games: [CodeBreaker] = []
-    
     @State private var gameToEdit: CodeBreaker?
     
     var body: some View {
@@ -31,10 +34,9 @@ struct GameList: View {
                 }
             }
             .onDelete { offsets in
-                games.remove(atOffsets: offsets)
-            }
-            .onMove { offsets, destination in
-                games.move(fromOffsets: offsets, toOffset: destination)
+                for offset in offsets {
+                    modelContext.delete(games[offset])
+                }
             }
         }
         .onChange(of: games) {
@@ -66,28 +68,26 @@ struct GameList: View {
     @ViewBuilder
     private func gameEditor(game: CodeBreaker) -> some View {
         GameEditor(game: game) { editedGame in
-            if let index = games.firstIndex(of: game) {
-                games[index] = editedGame
-            } else {
-                games.insert(editedGame, at: 0)
+            if games.contains(game) {
+                modelContext.delete(game)
             }
+            modelContext.insert(editedGame)
         }
     }
     
     private func deleteButton(for game: CodeBreaker) -> some View {
         Button("Delete", systemImage: "minus.circle", role: .destructive) {
             withAnimation {
-                games.removeAll { $0 == game }
+                modelContext.delete(game)
             }
         }
     }
     
     private func addSampleGames() {
         guard games.isEmpty else { return }
-        games.append(.init(name: "Mastermind"))
-        games.append(.init(name: "Earth Tones"))
-        games.append(.init(name: "Undersea"))
-        selection = games.randomElement()
+        modelContext.insert(CodeBreaker(name: "Mastermind"))
+        modelContext.insert(CodeBreaker(name: "Earth Tones"))
+        modelContext.insert(CodeBreaker(name: "Undersea"))
     }
 }
 
