@@ -12,6 +12,7 @@ struct GameChooser: View {
     @State private var selection: CodeBreaker?
     
     @State private var sortOption: GameList.SortOption = .name
+    @State private var search: String = ""
     
     var body: some View {
         NavigationSplitView(columnVisibility: .constant(.all)) {
@@ -22,8 +23,9 @@ struct GameChooser: View {
             }
             .pickerStyle(.segmented)
             .padding(.horizontal)
-            GameList(sortBy: sortOption, selection: $selection)
+            GameList(sortBy: sortOption, nameContains: search, selection: $selection)
                 .navigationTitle("Code Breaker")
+                .searchable(text: $search)
         } detail: {
             if let selection {
                 CodeBreakerView(game: selection)
