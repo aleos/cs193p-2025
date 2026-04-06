@@ -14,10 +14,29 @@ struct GameList: View {
     
     // MARK: Data Shared with Me
     @Binding var selection: CodeBreaker?
-    @Query(sort: \CodeBreaker.name, order: .forward) private var games: [CodeBreaker]
+    @Query private var games: [CodeBreaker]
     
     // MARK: Data Owned by Me
     @State private var gameToEdit: CodeBreaker?
+    
+    init(sortBy: SortOption = .name, selection: Binding<CodeBreaker?>) {
+        _selection = selection
+        switch sortBy {
+        case .name: _games = Query(sort: \.name)
+        case .recent: _games = Query(sort: \.lastAttemptDate, order: .reverse)
+        }
+    }
+    
+    enum SortOption: CaseIterable {
+        case name, recent
+        
+        var title: String {
+            switch self {
+            case .name: "Sort by Name"
+            case .recent: "Recent"
+            }
+        }
+    }
     
     var body: some View {
         List(selection: $selection) {

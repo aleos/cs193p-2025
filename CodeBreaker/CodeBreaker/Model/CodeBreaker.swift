@@ -18,6 +18,7 @@ final class CodeBreaker {
     @Transient var startTime: Date?
     var endTime: Date?
     var elapsedTime: TimeInterval = 0
+    var lastAttemptDate = Date.now
     
     var attempts: [Code] {
         get { _attempts.sorted { $0.timestamp > $1.timestamp } }
@@ -74,6 +75,7 @@ final class CodeBreaker {
         guard canAttemptGuess else { return }
         let attempt = Code(kind: .attempt(guess.match(against: masterCode)), pegs: guess.pegs)
         attempts.insert(attempt, at: 0)
+        lastAttemptDate = .now
         guess.reset()
         if isOver {
             endTime = .now
