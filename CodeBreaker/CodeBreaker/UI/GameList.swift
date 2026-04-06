@@ -84,10 +84,12 @@ struct GameList: View {
     }
     
     private func addSampleGames() {
-        guard games.isEmpty else { return }
-        modelContext.insert(CodeBreaker(name: "Mastermind"))
-        modelContext.insert(CodeBreaker(name: "Earth Tones"))
-        modelContext.insert(CodeBreaker(name: "Undersea"))
+        let fetchDescriptor = FetchDescriptor<CodeBreaker>()
+        if let results = try? modelContext.fetchCount(fetchDescriptor), results == 0 {
+            modelContext.insert(CodeBreaker(name: "Mastermind"))
+            modelContext.insert(CodeBreaker(name: "Earth Tones"))
+            modelContext.insert(CodeBreaker(name: "Undersea"))
+        }
     }
 }
 
