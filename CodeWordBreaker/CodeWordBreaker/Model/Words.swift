@@ -24,7 +24,7 @@ final class Words {
             if let url {
                 do {
                     for try await word in url.lines {
-                        _words[word.count, default: Set<String>()].insert(word.uppercased())
+                        _words[word.count, default: Set<String>()].insert(word.lowercased())
                     }
                 } catch {
                     print("Words could not load words from \(url): \(error)")
@@ -42,7 +42,7 @@ final class Words {
     }
     
     func contains(_ word: String) -> Bool {
-        words[word.count]?.contains(word.uppercased()) == true
+        words[word.count]?.contains(word.lowercased()) == true
     }
 
     func random(length: Int) -> String? {

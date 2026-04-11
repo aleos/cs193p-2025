@@ -49,7 +49,7 @@ final class CodeWordBreaker {
         let attempt = Code(kind: .attempt(guess.match(against: masterCode)), pegs: guess.pegs)
         attempts.append(attempt)
         lastAttemptedAt = .now
-        print("Attempt: \(attempt)")
+        print("Attempt: \(attempt.word)")
         guess.reset()
         if isOver {
             masterCode.kind = .master(isHidden: false)

@@ -15,13 +15,11 @@ final class Code {
         get { .init(rawValue: _kind) }
         set { _kind = newValue.rawValue }
     }
-    var pegs: [Peg]
-    var timestamp = Date.now
-    
-    init(kind: Kind, pegs: [Peg] = Array<Peg>(repeating: .missing, count: 5)) {
-        self._kind = kind.rawValue
-        self.pegs = pegs
+    var pegs: [Peg] {
+        get { word.map(Peg.init) }
+        set { word = newValue.joined().lowercased() }
     }
+    var timestamp = Date.now
     
     enum Kind: Hashable {
         case master(isHidden: Bool)
@@ -36,17 +34,16 @@ final class Code {
     
     var hasMissingPegs: Bool { pegs.contains { $0 == Peg.missing } }
     
-    var word: String {
-        get { pegs.joined() }
-        set {
-            pegs = newValue.uppercased().map(Peg.init)
-            print("New word is \(word.isEmpty ? "missing" : newValue)")
-        }
+    var word: String
+    
+    init(kind: Kind, pegs: [Peg] = Array<Peg>(repeating: .missing, count: 5)) {
+        self._kind = kind.rawValue
+        self.word = pegs.joined()
     }
     
     init(kind: Kind, numberOfPegs: Int) {
         self._kind = kind.rawValue
-        self.pegs = Array(repeating: Peg.missing, count: numberOfPegs)
+        self.word = String(repeating: Peg.missing, count: numberOfPegs)
     }
     
     var isHidden: Bool {
