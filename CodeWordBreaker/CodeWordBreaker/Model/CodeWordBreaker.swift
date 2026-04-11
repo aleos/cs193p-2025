@@ -7,12 +7,6 @@
 
 import Foundation
 
-typealias Peg = String
-
-extension Peg {
-    static let missing = " "
-}
-
 @Observable
 final class CodeWordBreaker {
     static let defaultNumberOfLetters: Int = 5
