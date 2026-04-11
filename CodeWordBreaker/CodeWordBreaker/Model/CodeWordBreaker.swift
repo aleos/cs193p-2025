@@ -10,7 +10,7 @@ import Foundation
 typealias Peg = String
 
 extension Peg {
-    static let missing = ""
+    static let missing = " "
 }
 
 @Observable
