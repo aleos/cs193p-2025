@@ -5,6 +5,7 @@
 //  Created by Alexander Ostrovsky on 30/3/2026.
 //
 
+import SwiftData
 import SwiftUI
 
 struct GameChooser: View {
@@ -17,51 +18,27 @@ struct GameChooser: View {
     @State private var isSettingsPresented: Bool = false
     @State private var selectedGame: CodeWordBreaker?
     
-    private var sortedGames: [CodeWordBreaker] {
-        games.sorted(using: [KeyPathComparator(\.lastAttemptedAt, order: .reverse), .init(\.created, order: .reverse)])
-    }
-    
     var body: some View {
         NavigationSplitView {
-            List(selection: $selectedGame) {
-                ForEach(sortedGames) { game in
-                    NavigationLink(value: game) {
-                        GameSummary(game: game)
-                            .allowsHitTesting(false)
+            GameList(selection: $selectedGame)
+                .sheet(isPresented: $isSettingsPresented) {
+                    Settings(isPresented: $isSettingsPresented)
+                }
+                .toolbar {
+                    ToolbarItem(placement: .primaryAction) {
+                        if words.count == 0 {
+                            ProgressView()
+                        } else {
+                            newGame
+                        }
                     }
-                    .swipeActions(edge: .leading) {
-                        NavigationLink(value: game.masterCode.word) {
-                            Label("Cheat", systemImage: "eye")
-                                .tint(.purple)
+                    ToolbarItem(placement: .topBarLeading) {
+                        Button("Settings", systemImage: "gearshape") {
+                            isSettingsPresented = true
                         }
                     }
                 }
-                .onDelete { offsets in
-                    let toDelete = offsets.map { sortedGames[$0] }
-                    games.removeAll { toDelete.contains($0) }
-                }
-            }
-            .listStyle(.plain)
-            .navigationDestination(for: String.self) { word in
-                Text(word).font(.largeTitle)
-            }
-            .sheet(isPresented: $isSettingsPresented) {
-                Settings(isPresented: $isSettingsPresented)
-            }
-            .toolbar {
-                ToolbarItem(placement: .primaryAction) {
-                    if words.count == 0 {
-                        ProgressView()
-                    } else {
-                        newGame
-                    }
-                }
-                ToolbarItem(placement: .topBarLeading) {
-                    Button("Settings", systemImage: "gearshape") {
-                        isSettingsPresented = true
-                    }
-                }
-            }
+                .navigationTitle("Code Word Breaker")
         } detail: {
             if let selectedGame {
                 CodeWordBreakerView(game: selectedGame)
@@ -115,6 +92,6 @@ struct GameChooser: View {
     }
 }
 
-#Preview {
+#Preview(traits: .swiftData) {
     GameChooser()
 }
