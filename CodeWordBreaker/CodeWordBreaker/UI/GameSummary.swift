@@ -37,7 +37,7 @@ struct GameSummary: View {
     }
 }
 
-#Preview {
+#Preview(traits: .swiftData) {
     @Previewable let game = CodeWordBreaker(word: "WORD")
     List {
         GameSummary(game: game)

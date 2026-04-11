@@ -9,9 +9,6 @@ import SwiftData
 import SwiftUI
 
 struct GameChooser: View {
-    // MARK: Data In
-    @Environment(\.settings) var settings
-    
     // MARK: Data Owned by Me
     @State private var isSettingsPresented: Bool = false
     @State private var selectedGame: CodeWordBreaker?

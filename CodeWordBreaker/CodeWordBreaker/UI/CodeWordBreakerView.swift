@@ -85,7 +85,7 @@ struct CodeWordBreakerView: View {
     }
 }
 
-#Preview {
+#Preview(traits: .swiftData) {
     @Previewable let game: CodeWordBreaker = .sample
     NavigationStack {
         CodeWordBreakerView(game: game)
