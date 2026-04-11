@@ -12,7 +12,7 @@ import SwiftData
 final class Code {
     var _kind: String
     var kind: Kind {
-        get { .init(rawValue: _kind) ?? .unknown }
+        get { .init(rawValue: _kind) }
         set { _kind = newValue.rawValue }
     }
     var pegs: [Peg]
@@ -92,24 +92,28 @@ final class Code {
 }
 
 extension Code.Kind: RawRepresentable {
+    private static let separator: String = ":"
+    private static let listSeparator: String = ","
+    
     var rawValue: String {
         switch self {
-        case .master(let isHidden): "master:\(isHidden)"
+        case .master(let isHidden): "master" + Self.separator + "\(isHidden)"
         case .guess: "guess"
-        case .attempt(let matches): "attempt:" + matches.map(\.rawValue).joined(separator: ",")
+        case .attempt(let matches): "attempt" + Self.separator + matches.map(\.rawValue).joined(separator: Self.listSeparator)
         case .unknown: "unknown"
         }
     }
     
-    init?(rawValue: String) {
-        let parts = rawValue.split(separator: ":", maxSplits: 1)
+    init(rawValue: String) {
+        let parts = rawValue.split(separator: Self.separator, maxSplits: 1)
         switch parts.first.map(String.init) {
         case "master":
-            self = .master(isHidden: parts.last == "true")
+            self = .master(isHidden: parts.last.map(String.init).map(Bool.init) != false)
         case "guess":
             self = .guess
         case "attempt":
-            let matches = parts.last?.split(separator: ",").compactMap { Code.Match(rawValue: String($0)) } ?? []
+            let tokens = parts.last?.split(separator: Self.listSeparator)
+            let matches = tokens?.compactMap { Code.Match(rawValue: String($0)) } ?? []
             self = .attempt(matches)
         default:
             self = .unknown
