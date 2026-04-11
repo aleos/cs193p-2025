@@ -14,7 +14,7 @@ final class CodeWordBreaker {
     
     @Relationship(deleteRule: .cascade) var masterCode = Code(kind: .master(isHidden: true), numberOfPegs: defaultNumberOfLetters)
     @Relationship(deleteRule: .cascade) var guess = Code(kind: .guess, numberOfPegs: defaultNumberOfLetters)
-    @Relationship(deleteRule: .cascade) var attempts: [Code] = []
+    @Relationship(deleteRule: .cascade) var _attempts: [Code] = []
     @Transient private(set) var startTime: Date?
     private(set) var elapsedTime: TimeInterval = 0
     private(set) var endTime: Date?
@@ -23,12 +23,17 @@ final class CodeWordBreaker {
     
     var canAttemptGuess: Bool { !guess.pegs.isEmpty && !guess.hasMissingPegs && !attempts.contains { $0.pegs == guess.pegs } }
     
-    init(word: String? = nil) {
-        restart(masterWord: word)
+    var attempts: [Code] {
+        get { _attempts.sorted { $0.timestamp > $1.timestamp } }
+        set { _attempts = newValue }
     }
     
     var isOver: Bool {
-        attempts.last?.pegs == masterCode.pegs
+        attempts.first?.pegs == masterCode.pegs
+    }
+    
+    init(word: String? = nil) {
+        restart(masterWord: word)
     }
     
     func restart(numberOfPegs: Int? = nil, masterWord: String? = nil) {
@@ -71,7 +76,10 @@ final class CodeWordBreaker {
     }
     
     func resume() {
-        guard endTime == nil else { return }
+        guard !isOver else { return }
+        // Nudge a persisted property so SwiftData triggers a UI update
+        // (@Transient startTime changes aren't observed)
+        elapsedTime += 0.00001
         startTime = .now
     }
     
