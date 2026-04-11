@@ -24,6 +24,7 @@ final class CodeWordBreaker {
     private(set) var elapsedTime: TimeInterval = 0
     private(set) var endTime: Date?
     private(set) var lastAttemptedAt: Date?
+    private(set) var created: Date = .now
     
     var canAttemptGuess: Bool { !guess.pegs.isEmpty && !guess.hasMissingPegs && !attempts.contains { $0.pegs == guess.pegs } }
     
@@ -108,10 +109,11 @@ extension Array where Element == CodeWordBreaker {
         let swift = CodeWordBreaker(word: "swift")
         makeAttempts(["house", "plant", "water", "beach", "swift"], in: swift)
         let quick = CodeWordBreaker(word: "quick")
+        let dirty = CodeWordBreaker(word: "dirty")
         let sweet = CodeWordBreaker(word: "sweet")
         makeAttempts(["bread", "light", "grass", "chair", "dream", "flame", "truck", "shelf", "paint", "guard", "clock", "storm", "train", "smile"], in: sweet)
         
-        return [apple, swift, quick, sweet]
+        return [apple, swift, quick, dirty, sweet]
     }
     
     private static func makeAttempts(_ words: [String], in game: CodeWordBreaker) {

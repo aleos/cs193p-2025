@@ -18,7 +18,7 @@ struct GameChooser: View {
     @State private var selectedGame: CodeWordBreaker?
     
     private var sortedGames: [CodeWordBreaker] {
-        games.sorted(using: KeyPathComparator(\.lastAttemptedAt, order: .reverse))
+        games.sorted(using: [KeyPathComparator(\.lastAttemptedAt, order: .reverse), .init(\.created, order: .reverse)])
     }
     
     var body: some View {
