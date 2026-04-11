@@ -11,7 +11,9 @@ import SwiftUI
 
 struct SwiftDataPreview: PreviewModifier {
     static func makeSharedContext() async throws -> ModelContainer {
-        try ModelContainer(for: CodeWordBreaker.self, configurations: .init(isStoredInMemoryOnly: true))
+        let container = try ModelContainer(for: CodeWordBreaker.self, configurations: .init(isStoredInMemoryOnly: true))
+//        [CodeWordBreaker].samples.forEach(container.mainContext.insert)
+        return container
     }
     
     func body(content: Content, context: ModelContainer) -> some View {
