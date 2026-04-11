@@ -12,10 +12,19 @@ struct GameChooser: View {
     // MARK: Data Owned by Me
     @State private var isSettingsPresented: Bool = false
     @State private var selectedGame: CodeWordBreaker?
+    @State private var search: String = ""
+    @State private var filterOption: GameList.FilterOption = .all
     
     var body: some View {
         NavigationSplitView {
-            GameList(selection: $selectedGame)
+            Picker("Show", selection: $filterOption.animation(.default)) {
+                ForEach(GameList.FilterOption.allCases, id: \.self) { option in
+                    Text(option.title)
+                }
+            }
+            .pickerStyle(.segmented)
+            .padding(.horizontal)
+            GameList(selection: $selectedGame, codeContains: search, filterBy: filterOption)
                 .sheet(isPresented: $isSettingsPresented) {
                     Settings(isPresented: $isSettingsPresented)
                 }
@@ -27,6 +36,7 @@ struct GameChooser: View {
                     }
                 }
                 .navigationTitle("Code Word Breaker")
+                .searchable(text: $search)
         } detail: {
             if let selectedGame {
                 CodeWordBreakerView(game: selectedGame)

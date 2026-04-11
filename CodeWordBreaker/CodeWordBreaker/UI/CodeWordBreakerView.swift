@@ -29,8 +29,8 @@ struct CodeWordBreakerView: View {
                         .transaction { $0.animation = nil }
                         .modifier(ShakeEffect(shakes: invalidGuessCount))
                 }
-                ForEach(game.attempts.indices.reversed(), id: \.self) { index in
-                    CodeView(code: game.attempts[index])
+                ForEach(game.attempts) { attempt in
+                    CodeView(code: attempt)
                         .transition(.attempt(game.isOver))
                 }
                 .padding(.horizontal)
@@ -49,7 +49,6 @@ struct CodeWordBreakerView: View {
             }
         }
         .padding(.top)
-        .trackElapsedTime(in: game)
         .toolbar {
             ToolbarItem {
                 ElapsedTime(startTime: game.startTime, endTime: game.endTime, elapsedTime: game.elapsedTime)
@@ -58,6 +57,7 @@ struct CodeWordBreakerView: View {
                     .fixedSize(horizontal: true, vertical: false)
             }
         }
+        .trackElapsedTime(in: game)
         .navigationBarTitleDisplayMode(.inline)
     }
     

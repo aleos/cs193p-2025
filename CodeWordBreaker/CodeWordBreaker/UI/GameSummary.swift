@@ -13,7 +13,7 @@ struct GameSummary: View {
     var body: some View {
         VStack(alignment: .leading) {
             Group {
-                if let lastAttempt = game.attempts.last {
+                if let lastAttempt = game.attempts.first {
                     CodeView(code: lastAttempt)
                 } else {
                     CodeView(

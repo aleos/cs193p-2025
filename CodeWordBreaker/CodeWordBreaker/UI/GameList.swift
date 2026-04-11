@@ -21,6 +21,55 @@ struct GameList: View {
     // MARK: Data Owned by Me
     @State private var gameToEdit: CodeWordBreaker?
     
+    enum FilterOption: CaseIterable {
+        case all, completedOnly, incompleteOnly
+        
+        var title: String {
+            switch self {
+            case .all: "All"
+            case .completedOnly: "Completed Only"
+            case .incompleteOnly: "Incomplete Only"
+            }
+        }
+    }
+    
+    init(selection: Binding<CodeWordBreaker?>, codeContains search: String = "", filterBy filter: FilterOption = .all) {
+        _selection = selection
+        
+        let lowercasedSearch = search.lowercased().filter(\.isLetter)
+        
+        let searchPredicate: Predicate<CodeWordBreaker>
+        if search.isEmpty {
+            searchPredicate = #Predicate { _ in true }
+        } else {
+            searchPredicate = #Predicate { game in
+                game.masterCode.word.contains(lowercasedSearch)
+                || game._attempts.contains(where: { $0.word.contains(lowercasedSearch) })
+            }
+        }
+        
+        let filterPredicate: Predicate<CodeWordBreaker>
+        switch filter {
+        case .all:
+            filterPredicate = .true
+        case .completedOnly:
+            filterPredicate = #Predicate { $0.endTime != nil }
+        case .incompleteOnly:
+            filterPredicate = #Predicate { $0.endTime == nil }
+        }
+        
+        let combinedPredicate = #Predicate<CodeWordBreaker> { game in
+            searchPredicate.evaluate(game) && filterPredicate.evaluate(game)
+        }
+        _games = Query(
+            filter: combinedPredicate,
+            sort: [
+                .init(\.lastAttemptedAt, order: .reverse),
+                .init(\.created, order: .reverse)
+            ]
+        )
+    }
+    
     var body: some View {
         List(selection: $selection) {
             ForEach(games) { game in
