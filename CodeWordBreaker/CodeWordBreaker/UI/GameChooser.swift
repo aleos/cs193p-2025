@@ -13,7 +13,7 @@ struct GameChooser: View {
     @Environment(\.settings) var settings
     
     // MARK: Data Owned by Me
-    @State private var games: [CodeWordBreaker] = .samples
+    @State private var games: [CodeWordBreaker] = []
     @State private var isSettingsPresented: Bool = false
     @State private var selectedGame: CodeWordBreaker?
     

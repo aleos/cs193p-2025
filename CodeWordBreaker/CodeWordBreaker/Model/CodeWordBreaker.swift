@@ -6,19 +6,20 @@
 //
 
 import Foundation
+import SwiftData
 
-@Observable
+@Model
 final class CodeWordBreaker {
     static let defaultNumberOfLetters: Int = 5
     
-    var masterCode: Code = .init(kind: .master(isHidden: true), numberOfPegs: defaultNumberOfLetters)
-    var guess: Code = .init(kind: .guess, numberOfPegs: defaultNumberOfLetters)
-    var attempts: [Code] = []
-    private(set) var startTime: Date?
+    @Relationship(deleteRule: .cascade) var masterCode = Code(kind: .master(isHidden: true), numberOfPegs: defaultNumberOfLetters)
+    @Relationship(deleteRule: .cascade) var guess = Code(kind: .guess, numberOfPegs: defaultNumberOfLetters)
+    @Relationship(deleteRule: .cascade) var attempts: [Code] = []
+    @Transient private(set) var startTime: Date?
     private(set) var elapsedTime: TimeInterval = 0
     private(set) var endTime: Date?
     private(set) var lastAttemptedAt: Date?
-    private(set) var created: Date = .now
+    private(set) var created = Date.now
     
     var canAttemptGuess: Bool { !guess.pegs.isEmpty && !guess.hasMissingPegs && !attempts.contains { $0.pegs == guess.pegs } }
     
@@ -45,8 +46,7 @@ final class CodeWordBreaker {
     
     func attemptGuess() {
         guard canAttemptGuess else { return }
-        var attempt = guess
-        attempt.kind = .attempt(guess.match(against: masterCode))
+        let attempt = Code(kind: .attempt(guess.match(against: masterCode)), pegs: guess.pegs)
         attempts.append(attempt)
         lastAttemptedAt = .now
         print("Attempt: \(attempt)")
@@ -82,16 +82,6 @@ final class CodeWordBreaker {
     }
 }
 
-extension CodeWordBreaker: Identifiable, Hashable {
-    static func == (lhs: CodeWordBreaker, rhs: CodeWordBreaker) -> Bool {
-        lhs.id == rhs.id
-    }
-    
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
-    }
-}
-
 extension CodeWordBreaker {
     static var sample: CodeWordBreaker { [CodeWordBreaker].samples.first ?? .init() }
 }
@@ -112,7 +102,7 @@ extension Array where Element == CodeWordBreaker {
     
     private static func makeAttempts(_ words: [String], in game: CodeWordBreaker) {
         for word in words {
-            var guess = Code(kind: .guess, numberOfPegs: CodeWordBreaker.defaultNumberOfLetters)
+            let guess = Code(kind: .guess, numberOfPegs: CodeWordBreaker.defaultNumberOfLetters)
             guess.word = word
             game.guess = guess
             game.attemptGuess()

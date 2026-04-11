@@ -6,10 +6,22 @@
 //
 
 import Foundation
+import SwiftData
 
-struct Code: Hashable {
-    var kind: Kind
+@Model
+final class Code {
+    var _kind: String
+    var kind: Kind {
+        get { .init(rawValue: _kind) ?? .unknown }
+        set { _kind = newValue.rawValue }
+    }
     var pegs: [Peg]
+    var timestamp = Date.now
+    
+    init(kind: Kind, pegs: [Peg] = Array<Peg>(repeating: .missing, count: 4)) {
+        self._kind = kind.rawValue
+        self.pegs = pegs
+    }
     
     enum Kind: Hashable {
         case master(isHidden: Bool)
@@ -29,7 +41,7 @@ struct Code: Hashable {
     }
     
     init(kind: Kind, numberOfPegs: Int) {
-        self.kind = kind
+        self._kind = kind.rawValue
         self.pegs = Array(repeating: Peg.missing, count: numberOfPegs)
     }
     
@@ -40,7 +52,7 @@ struct Code: Hashable {
         }
     }
     
-    mutating func reset() {
+    func reset() {
         pegs = Array(repeating: Peg.missing, count: pegs.count)
     }
     
@@ -71,6 +83,32 @@ struct Code: Hashable {
             } else {
                 return exactMatches[index]
             }
+        }
+    }
+}
+
+extension Code.Kind: RawRepresentable {
+    var rawValue: String {
+        switch self {
+        case .master(let isHidden): "master:\(isHidden)"
+        case .guess: "guess"
+        case .attempt(let matches): "attempt:" + matches.map(\.rawValue).joined(separator: ",")
+        case .unknown: "unknown"
+        }
+    }
+    
+    init?(rawValue: String) {
+        let parts = rawValue.split(separator: ":", maxSplits: 1)
+        switch parts.first.map(String.init) {
+        case "master":
+            self = .master(isHidden: parts.last == "true")
+        case "guess":
+            self = .guess
+        case "attempt":
+            let matches = parts.last?.split(separator: ",").compactMap { Match(rawValue: String($0)) } ?? []
+            self = .attempt(matches)
+        default:
+            self = .unknown
         }
     }
 }
