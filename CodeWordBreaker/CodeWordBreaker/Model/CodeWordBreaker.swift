@@ -63,7 +63,7 @@ final class CodeWordBreaker {
         guess.pegs[index] = peg
     }
     
-    func bestResult(for peg: Peg) -> Match? {
+    func bestResult(for peg: Peg) -> Code.Match? {
         let pegMatches = attempts.flatMap { attempt in
             zip(attempt.pegs, attempt.matches ?? []).map { (peg: $0, match: $1) }
         }

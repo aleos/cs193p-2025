@@ -16,7 +16,7 @@ struct PegKeyboard: View {
     let onErase: (() -> Void)?
     let onGuess: (() -> Void)?
     var canGuess: Bool = true
-    var bestResult: ((Peg) -> Match?)? = nil
+    var bestResult: ((Peg) -> Code.Match?)? = nil
     
     // MARK: - Body
     

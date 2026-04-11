@@ -30,6 +30,10 @@ final class Code {
         case unknown
     }
     
+    enum Match: String, CaseIterable {
+        case nomatch, inexact, exact
+    }
+    
     var hasMissingPegs: Bool { pegs.contains { $0 == Peg.missing } }
     
     var word: String {
@@ -105,10 +109,18 @@ extension Code.Kind: RawRepresentable {
         case "guess":
             self = .guess
         case "attempt":
-            let matches = parts.last?.split(separator: ",").compactMap { Match(rawValue: String($0)) } ?? []
+            let matches = parts.last?.split(separator: ",").compactMap { Code.Match(rawValue: String($0)) } ?? []
             self = .attempt(matches)
         default:
             self = .unknown
         }
     }
 }
+
+extension Code.Match: Comparable {
+    static func < (lhs: Self, rhs: Self) -> Bool {
+        let order = allCases
+        return order.firstIndex(of: lhs)! < order.firstIndex(of: rhs)!
+    }
+}
+

@@ -30,7 +30,7 @@ final class AppSettings {
         didSet { UserDefaults.standard.set(noMatchColor.hex, forKey: Key.noMatchColor.rawValue) }
     }
     
-    func color(for match: Match) -> Color {
+    func color(for match: Code.Match) -> Color {
         switch match {
         case .exact: exactMatchColor
         case .inexact: inexactMatchColor
