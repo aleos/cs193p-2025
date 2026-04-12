@@ -66,11 +66,6 @@ struct CodeView<AncillaryView>: View where AncillaryView: View {
                         }
                     }
                     .transition(.opacity)
-                    .onTapGesture {
-                        if code.kind == .guess {
-                            selection = index
-                        }
-                    }
             }
             let ancillary = ancillaryView()
             if !(ancillary is EmptyView) {
@@ -124,6 +119,6 @@ fileprivate struct Selection {
 #Preview {
     @Previewable @State var selection: Int = 0
     CodeView(code: .init(kind: .guess, numberOfPegs: 4), selection: $selection) { Color.teal }
-    CodeView(code: .init(kind: .guess, numberOfPegs: 4), selection: $selection)
-    CodeView(code: .init(kind: .attempt(Array(repeating: .nomatch, count: 4)), numberOfPegs: 4))
+    CodeView(code: .init(kind: .guess, word: "alex"), selection: $selection)
+    CodeView(code: .init(kind: .attempt([.nomatch, .inexact, .exact, .exact]), numberOfPegs: 4))
 }
