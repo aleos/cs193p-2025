@@ -9,7 +9,7 @@ import SwiftUI
 
 struct CodeView<AncillaryView>: View where AncillaryView: View {
     // MARK: Data In
-    @Environment(\.settings) var settings
+    @Environment(\.settings) private var settings
     let code: Code
     
     // MARK: Data Shared with Me
