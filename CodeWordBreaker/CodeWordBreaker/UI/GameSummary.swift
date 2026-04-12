@@ -8,7 +8,10 @@
 import SwiftUI
 
 struct GameSummary: View {
+    // MARK: Data In
     let game: CodeWordBreaker
+    
+    // MARK: - Body
     
     var body: some View {
         VStack(alignment: .leading) {

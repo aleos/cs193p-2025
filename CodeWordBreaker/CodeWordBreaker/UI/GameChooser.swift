@@ -19,6 +19,8 @@ struct GameChooser: View {
     @State private var search: String = ""
     @State private var filterOption: GameList.FilterOption = .all
     
+    // MARK: - Body
+    
     var body: some View {
         NavigationSplitView {
             Picker("Show", selection: $filterOption.animation(.default)) {
