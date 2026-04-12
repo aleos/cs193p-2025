@@ -74,6 +74,11 @@ final class CodeWordBreaker {
         return pegMatches.filter { $0.peg == peg }.map(\.match).max()
     }
     
+    func updateElapsedTime() {
+        pause()
+        resume()
+    }
+    
     func resume() {
         guard !isOver else { return }
         // Nudge a persisted property so SwiftData triggers a UI update

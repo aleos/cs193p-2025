@@ -5,6 +5,7 @@
 //  Created by Alexander Ostrovsky on 12/4/2026.
 //
 
+import SwiftData
 import SwiftUI
 
 extension View {
@@ -15,9 +16,15 @@ extension View {
 
 struct ElapsedTimeTracker: ViewModifier {
     // MARK: Data In
+    @Environment(\.modelContext) private var modelContext
     @Environment(\.scenePhase) private var scenePhase
     let game: CodeWordBreaker
-
+    
+    // MARK: Data Owned by Me
+    var modelContextWillSavePublisher: NotificationCenter.Publisher {
+        NotificationCenter.default.publisher(for: ModelContext.willSave, object: modelContext)
+    }
+    
     func body(content: Content) -> some View {
         content
             .onAppear {
@@ -39,6 +46,10 @@ struct ElapsedTimeTracker: ViewModifier {
                 default:
                     break
                 }
+            }
+            .onReceive(modelContextWillSavePublisher) {_ in
+                game.updateElapsedTime()
+                print("updated elapsed time to \(game.elapsedTime)")
             }
     }
 }
