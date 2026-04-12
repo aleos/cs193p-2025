@@ -43,6 +43,7 @@ struct GameChooser: View {
                 }
                 .navigationTitle("Code Word Breaker")
                 .searchable(text: $search)
+                .animation(.easeOut, value: search)
         } detail: {
             if let selectedGame {
                 CodeWordBreakerView(game: selectedGame)
