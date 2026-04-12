@@ -9,6 +9,10 @@ import SwiftData
 import SwiftUI
 
 struct GameChooser: View {
+    // MARK: Data Shared with Me
+    @Environment(\.modelContext) private var modelContext
+    @Query private var allSettings: [AppSettings]
+    
     // MARK: Data Owned by Me
     @State private var isSettingsPresented: Bool = false
     @State private var selectedGame: CodeWordBreaker?
@@ -42,6 +46,12 @@ struct GameChooser: View {
                 CodeWordBreakerView(game: selectedGame)
             } else {
                 Text("Choose a game")
+            }
+        }
+        .environment(\.settings, allSettings.first ?? AppSettings.shared)
+        .onAppear {
+            if allSettings.isEmpty {
+                modelContext.insert(AppSettings.shared)
             }
         }
     }

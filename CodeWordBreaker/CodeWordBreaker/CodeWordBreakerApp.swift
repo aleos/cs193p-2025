@@ -13,7 +13,7 @@ struct CodeWordBreakerApp: App {
     var body: some Scene {
         WindowGroup {
             GameChooser()
-                .modelContainer(for: CodeWordBreaker.self)
+                .modelContainer(for: [CodeWordBreaker.self, AppSettings.self])
         }
     }
 }
