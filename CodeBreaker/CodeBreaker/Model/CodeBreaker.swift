@@ -42,6 +42,11 @@ final class CodeBreaker {
         restart()
     }
     
+    func updateElapsedTime() {
+        pauseTimer()
+        startTimer()
+    }
+    
     func startTimer() {
         if !isOver {
             startTime = .now
