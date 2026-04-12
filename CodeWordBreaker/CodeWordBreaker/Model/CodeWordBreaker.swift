@@ -20,6 +20,7 @@ final class CodeWordBreaker {
     private(set) var endTime: Date?
     private(set) var lastAttemptedAt: Date?
     private(set) var created = Date.now
+    var isOver: Bool = false
     
     var canAttemptGuess: Bool { !guess.pegs.isEmpty && !guess.hasMissingPegs && !attempts.contains { $0.pegs == guess.pegs } }
     
@@ -27,11 +28,7 @@ final class CodeWordBreaker {
         get { _attempts.sorted { $0.timestamp > $1.timestamp } }
         set { _attempts = newValue }
     }
-    
-    var isOver: Bool {
-        attempts.first?.pegs == masterCode.pegs
-    }
-    
+        
     init(word: String? = nil) {
         restart(masterWord: word)
     }
@@ -47,6 +44,7 @@ final class CodeWordBreaker {
         guess = Code(kind: .guess, numberOfPegs: numberOfPegs)
         attempts.removeAll()
         endTime = nil
+        isOver = false
     }
     
     func attemptGuess() {
@@ -56,7 +54,8 @@ final class CodeWordBreaker {
         lastAttemptedAt = .now
         print("Attempt: \(attempt.word)")
         guess.reset()
-        if isOver {
+        if attempts.first?.pegs == masterCode.pegs {
+            isOver = true
             masterCode.kind = .master(isHidden: false)
             pause()
             endTime = .now

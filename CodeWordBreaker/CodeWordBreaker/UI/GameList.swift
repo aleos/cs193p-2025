@@ -50,9 +50,9 @@ struct GameList: View {
         case .all:
             filterPredicate = .true
         case .completedOnly:
-            filterPredicate = #Predicate { $0.endTime != nil }
+            filterPredicate = #Predicate { $0.isOver }
         case .incompleteOnly:
-            filterPredicate = #Predicate { $0.endTime == nil }
+            filterPredicate = #Predicate { !$0.isOver }
         }
         
         let combinedPredicate = #Predicate<CodeWordBreaker> { game in
