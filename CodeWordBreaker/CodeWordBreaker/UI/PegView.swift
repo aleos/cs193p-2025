@@ -15,8 +15,8 @@ struct PegView: View {
     
     var body: some View {
         Text(peg.uppercased())
-            .font(.system(size: 120))
-            .minimumScaleFactor(9/120)
+            .flexibleSystemFont()
+            .scaledToFit()
             .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
