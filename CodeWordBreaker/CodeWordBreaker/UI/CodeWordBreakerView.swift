@@ -41,7 +41,7 @@ struct CodeWordBreakerView: View {
                     .padding()
                     .background {
                         Rectangle()
-                            .clipShape(.rect(cornerRadius: 16))
+                            .clipShape(.rect(cornerRadius: Layout.keyboardCornerRadius))
                             .foregroundStyle(.background)
                             .ignoresSafeArea(.all, edges: .bottom)
                     }
@@ -83,6 +83,10 @@ struct CodeWordBreakerView: View {
             selection = 0
         }
     }
+}
+
+private enum Layout {
+    static let keyboardCornerRadius: CGFloat = 16
 }
 
 #Preview(traits: .swiftData) {

@@ -27,7 +27,7 @@ struct GameSummary: View {
                     )
                 }
             }
-            .frame(maxHeight: 50)
+            .frame(maxHeight: Layout.codePreviewHeight)
             HStack {
                 Text("^[\(game.attempts.count) attempts](inflect: true)")
                 Spacer()
@@ -38,6 +38,10 @@ struct GameSummary: View {
             }
         }
     }
+}
+
+private enum Layout {
+    static let codePreviewHeight: CGFloat = 50
 }
 
 #Preview(traits: .swiftData) {

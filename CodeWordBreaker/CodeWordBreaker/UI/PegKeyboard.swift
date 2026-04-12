@@ -35,12 +35,12 @@ struct PegKeyboard: View {
                     row(for: ["a", "s", "d", "f", "g", "h", "j", "k", "l"], pegSize: pegSize)
                     HStack {
                         guessButton
-                            .frame(width: pegSize * 1.5)
+                            .frame(width: pegSize * Key.wideKeyMultiplier)
                         Spacer()
                         row(for: ["z", "x", "c", "v", "b", "n", "m"], pegSize: pegSize)
                         Spacer()
                         eraseButton
-                            .frame(width: pegSize * 1.5)
+                            .frame(width: pegSize * Key.wideKeyMultiplier)
                     }
                 }
             }
@@ -66,7 +66,7 @@ struct PegKeyboard: View {
         }
         .tint(.primary)
         .disabled(!canGuess)
-        .aspectRatio(Key.aspectRatio * 1.5, contentMode: .fit)
+        .aspectRatio(Key.aspectRatio * Key.wideKeyMultiplier, contentMode: .fit)
     }
     
     private var eraseButton: some View {
@@ -79,7 +79,7 @@ struct PegKeyboard: View {
                 )
         }
         .tint(.primary)
-        .aspectRatio(Key.aspectRatio * 1.5, contentMode: .fit)
+        .aspectRatio(Key.aspectRatio * Key.wideKeyMultiplier, contentMode: .fit)
     }
     
     func row(for choices: [Peg], pegSize: CGFloat) -> some View {
@@ -88,7 +88,7 @@ struct PegKeyboard: View {
                 Button {
                     onChoose?(peg)
                 } label: {
-                    let keyColor = bestResult?(peg).flatMap(settings.color)?.opacity(0.5)
+                    let keyColor = bestResult?(peg).flatMap(settings.color)?.opacity(Key.matchHintOpacity)
                     PegView(peg: peg)
                         .padding(Key.innerPadding)
                         .background(
@@ -110,15 +110,17 @@ struct PegKeyboard: View {
     }
 }
 
-fileprivate struct Key {
+private enum Key {
     static let shape = RoundedRectangle(cornerRadius: 5)
     static let aspectRatio: CGFloat = 3/4
+    static let wideKeyMultiplier: CGFloat = 1.5
     static let innerPadding: CGFloat = 4
     static let spacing: CGFloat = 10
     static let maxNumber = 10
     static let rowCount = 3
     static let borderColor: Color = Color.gray(0.85)
     static let color: BackgroundStyle = .background
+    static let matchHintOpacity: Double = 0.5
 }
 
 #Preview {

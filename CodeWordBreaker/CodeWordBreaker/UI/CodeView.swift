@@ -44,8 +44,8 @@ struct CodeView<AncillaryView>: View where AncillaryView: View {
                             transaction.animation = nil
                         }
                     }
-                    .scaleEffect(poppingIndex == index ? 1.15 : 1)
-                    .animation(.bouncy(duration: 0.15), value: poppingIndex)
+                    .scaleEffect(poppingIndex == index ? PegPop.scale : 1)
+                    .animation(.bouncy(duration: PegPop.bounceDuration), value: poppingIndex)
                     .aspectRatio(1, contentMode: .fit)
                     .padding(Selection.border)
                     .background { pegBackground(for: index) }
@@ -57,10 +57,10 @@ struct CodeView<AncillaryView>: View where AncillaryView: View {
                     )
                     .onChange(of: code.pegs[index]) {
                         guard code.kind == .guess, code.pegs[index] != .missing else { return }
-                        withAnimation(.easeOut(duration: 0.1)) {
+                        withAnimation(.easeOut(duration: PegPop.fadeOutDuration)) {
                             poppingIndex = index
                         } completion: {
-                            withAnimation(.easeIn(duration: 0.1)) {
+                            withAnimation(.easeIn(duration: PegPop.fadeInDuration)) {
                                 poppingIndex = nil
                             }
                         }
@@ -109,11 +109,18 @@ struct CodeView<AncillaryView>: View where AncillaryView: View {
     }
 }
 
-fileprivate struct Selection {
+private enum Selection {
     static let border: CGFloat = 5
     static let cornerRadius: CGFloat = 10
     static let color: Color = Color.gray(0.85)
     static let shape = RoundedRectangle(cornerRadius: cornerRadius)
+}
+
+private enum PegPop {
+    static let scale: CGFloat = 1.15
+    static let bounceDuration: Double = 0.15
+    static let fadeInDuration: Double = 0.1
+    static let fadeOutDuration: Double = 0.1
 }
 
 #Preview {
