@@ -18,9 +18,6 @@ struct GameList: View {
     @Binding var selection: CodeWordBreaker?
     @Query private var games: [CodeWordBreaker]
     
-    // MARK: Data Owned by Me
-    @State private var gameToEdit: CodeWordBreaker?
-    
     enum FilterOption: CaseIterable {
         case all, completedOnly, incompleteOnly
         
