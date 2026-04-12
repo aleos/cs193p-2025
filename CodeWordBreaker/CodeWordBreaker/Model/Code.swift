@@ -36,16 +36,19 @@ final class Code {
     
     var word: String
     
-    init(kind: Kind, pegs: [Peg] = Array<Peg>(repeating: .missing, count: 5)) {
+    init(kind: Kind, word: String) {
         self._kind = kind.rawValue
-        self.word = pegs.joined()
+        self.word = word.lowercased()
     }
     
-    init(kind: Kind, numberOfPegs: Int) {
-        self._kind = kind.rawValue
-        self.word = String(repeating: Peg.missing, count: numberOfPegs)
+    convenience init(kind: Kind, pegs: [Peg] = Array<Peg>(repeating: .missing, count: 5)) {
+        self.init(kind: kind, word: pegs.joined())
     }
     
+    convenience init(kind: Kind, numberOfPegs: Int) {
+        self.init(kind: kind, word: String(repeating: Peg.missing, count: numberOfPegs))
+    }
+        
     var isHidden: Bool {
         switch kind {
         case .master(let isHidden): isHidden
