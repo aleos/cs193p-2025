@@ -11,8 +11,8 @@ import SwiftUI
 struct GameList: View {
     // MARK: Data In
     @Environment(\.modelContext) private var modelContext
-    @Environment(\.words) var words
-    @Environment(\.settings) var settings
+    @Environment(\.words) private var words
+    @Environment(\.settings) private var settings
     
     // MARK: Data Shared with Me
     @Binding var selection: CodeWordBreaker?
@@ -27,8 +27,8 @@ struct GameList: View {
         var title: String {
             switch self {
             case .all: "All"
-            case .completedOnly: "Completed Only"
-            case .incompleteOnly: "Incomplete Only"
+            case .completedOnly: "Completed"
+            case .incompleteOnly: "Incomplete"
             }
         }
     }
