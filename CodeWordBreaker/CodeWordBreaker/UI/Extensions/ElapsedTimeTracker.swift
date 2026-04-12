@@ -42,3 +42,19 @@ struct ElapsedTimeTracker: ViewModifier {
             }
     }
 }
+
+#Preview(traits: .swiftData) {
+    @Previewable @State var game = CodeWordBreaker.sample
+    NavigationStack {
+        Color.clear
+            .trackElapsedTime(in: game)
+            .toolbar {
+                ToolbarItem {
+                    ElapsedTime(startTime: game.startTime, endTime: game.endTime, elapsedTime: game.elapsedTime)
+                        .monospaced()
+                        .lineLimit(1)
+                        .fixedSize(horizontal: true, vertical: false)
+                }
+            }
+    }
+}

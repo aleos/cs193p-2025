@@ -27,7 +27,7 @@ struct CodeWordBreakerView: View {
                     CodeView(code: game.guess, selection: $selection)
                         .padding(.horizontal)
                         .transaction { $0.animation = nil }
-                        .modifier(ShakeEffect(shakes: invalidGuessCount))
+                        .shake(shakes: invalidGuessCount)
                 }
                 ForEach(game.attempts) { attempt in
                     CodeView(code: attempt)

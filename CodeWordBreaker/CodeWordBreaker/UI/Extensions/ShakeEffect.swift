@@ -7,6 +7,12 @@
 
 import SwiftUI
 
+extension View {
+    func shake(shakes: Int) -> some View {
+        self.modifier(ShakeEffect(shakes: shakes))
+    }
+}
+
 struct ShakeEffect: GeometryEffect {
     private static let cyclesPerShake: CGFloat = 3
     private static let amplitude: CGFloat = 10
@@ -25,5 +31,19 @@ struct ShakeEffect: GeometryEffect {
     func effectValue(size: CGSize) -> ProjectionTransform {
         let translation = sin(shakes * .pi * 2 * Self.cyclesPerShake) * Self.amplitude
         return ProjectionTransform(CGAffineTransform(translationX: translation, y: 0))
+    }
+}
+
+#Preview {
+    @Previewable @State var shakes: Int = 0
+    VStack(spacing: 32) {
+        Text("Hello, world!")
+            .shake(shakes: shakes)
+        Button("Tap me") {
+            withAnimation(.linear(duration: 0.4)) {
+                shakes += 1
+            }
+        }
+        .buttonStyle(.glassProminent)
     }
 }

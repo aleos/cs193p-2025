@@ -26,3 +26,12 @@ extension Color {
 
     var hex: String { UIColor(self).hex }
 }
+
+#Preview {
+    VStack(spacing: 0) {
+        ForEach(Array(stride(from: 0x000000, through: 0xFFFFFF, by: 0xC0DE)), id: \.self) {
+            Color(UInt($0), alpha: 1)
+        }
+    }
+    .ignoresSafeArea(.all)
+}
