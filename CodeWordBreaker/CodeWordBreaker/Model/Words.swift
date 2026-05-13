@@ -11,6 +11,7 @@ extension EnvironmentValues {
     @Entry var words = Words.shared
 }
 
+@MainActor
 @Observable
 final class Words {
     private var words = Dictionary<Int, Set<String>>()

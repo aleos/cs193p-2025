@@ -14,7 +14,7 @@ extension Animation {
 }
 
 extension AnyTransition {
-    static let pegChooser = AnyTransition.offset(y: 300)
+    @MainActor static let pegChooser = AnyTransition.offset(y: 300)
     static func attempt(_ isOver: Bool) -> AnyTransition {
         AnyTransition.asymmetric(insertion: isOver ? .opacity : .move(edge: .top), removal: .move(edge: .trailing))
     }
