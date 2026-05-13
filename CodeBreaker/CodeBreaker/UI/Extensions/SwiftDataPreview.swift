@@ -22,6 +22,6 @@ extension PreviewTrait<Preview.ViewTraits> {
     @MainActor static var swiftData: Self = .modifier(SwiftDataPreview())
 }
 
-#Preview(traits: .modifier(SwiftDataPreview())) {
+#Preview(traits: .swiftData) {
     Text("Hello, World!")
 }

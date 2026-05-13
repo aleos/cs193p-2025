@@ -23,22 +23,25 @@ struct GameList: View {
         _selection = selection
         let lowercasedSearch = search.lowercased()
         let capitalizedSearch = search.capitalized
+        let completedOnly = sortBy == .completed
         let predicate = #Predicate<CodeBreaker> { game in
-            search.isEmpty || game.name.contains(lowercasedSearch) || game.name.contains(capitalizedSearch)
+            (!completedOnly || game.isOver) &&
+            (search.isEmpty || game.name.contains(lowercasedSearch) || game.name.contains(capitalizedSearch))
         }
         switch sortBy {
         case .name: _games = Query(filter: predicate, sort: \.name)
-        case .recent: _games = Query(filter: predicate, sort: \.lastAttemptDate, order: .reverse)
+        case .recent, .completed: _games = Query(filter: predicate, sort: \.lastAttemptDate, order: .reverse)
         }
     }
     
     enum SortOption: CaseIterable {
-        case name, recent
+        case name, recent, completed
         
         var title: String {
             switch self {
             case .name: "Sort by Name"
             case .recent: "Recent"
+            case .completed: "Completed"
             }
         }
     }
