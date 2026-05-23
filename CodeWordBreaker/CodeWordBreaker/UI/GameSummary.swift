@@ -8,12 +8,15 @@
 import SwiftUI
 
 struct GameSummary: View {
+    // MARK: Data In
     let game: CodeWordBreaker
+    
+    // MARK: - Body
     
     var body: some View {
         VStack(alignment: .leading) {
             Group {
-                if let lastAttempt = game.attempts.last {
+                if let lastAttempt = game.attempts.first {
                     CodeView(code: lastAttempt)
                 } else {
                     CodeView(
@@ -24,7 +27,7 @@ struct GameSummary: View {
                     )
                 }
             }
-            .frame(maxHeight: 50)
+            .frame(maxHeight: Layout.codePreviewHeight)
             HStack {
                 Text("^[\(game.attempts.count) attempts](inflect: true)")
                 Spacer()
@@ -37,7 +40,11 @@ struct GameSummary: View {
     }
 }
 
-#Preview {
+private enum Layout {
+    static let codePreviewHeight: CGFloat = 50
+}
+
+#Preview(traits: .swiftData) {
     @Previewable let game = CodeWordBreaker(word: "WORD")
     List {
         GameSummary(game: game)

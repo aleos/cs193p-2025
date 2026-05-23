@@ -14,6 +14,8 @@ struct Settings: View {
     // MARK: Data Shared with Me
     @Binding var isPresented: Bool
     
+    // MARK: - Body
+    
     var body: some View {
         @Bindable var settings = settings
         NavigationStack {

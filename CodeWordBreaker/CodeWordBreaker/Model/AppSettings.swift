@@ -5,32 +5,35 @@
 //  Created by Alexander Ostrovsky on 31/3/2026.
 //
 
-import Foundation
+import SwiftData
 import SwiftUI
 
 extension EnvironmentValues {
     @Entry var settings: AppSettings = .shared
 }
 
-@MainActor
-@Observable
+@Model
 final class AppSettings {
     static let shared = AppSettings()
-    
-    var defaultWordLength: Int = CodeWordBreaker.defaultNumberOfLetters {
-        didSet { UserDefaults.standard.set(defaultWordLength, forKey: Key.defaultWordLength.rawValue) }
-    }
+        
+    var defaultWordLength: Int = CodeWordBreaker.defaultNumberOfLetters
+    private var exactMatchHex = Color.green.hex
     var exactMatchColor: Color {
-        didSet { UserDefaults.standard.set(exactMatchColor.hex, forKey: Key.exactMatchColor.rawValue) }
+        get { Color(hex: exactMatchHex) ?? .green }
+        set { exactMatchHex = newValue.hex }
     }
+    private var inexactMatchHex = Color.yellow.hex
     var inexactMatchColor: Color {
-        didSet { UserDefaults.standard.set(inexactMatchColor.hex, forKey: Key.inexactMatchColor.rawValue) }
+        get { Color(hex: inexactMatchHex) ?? .yellow }
+        set { inexactMatchHex = newValue.hex }
     }
+    private var noMatchHex = Color.gray.hex
     var noMatchColor: Color {
-        didSet { UserDefaults.standard.set(noMatchColor.hex, forKey: Key.noMatchColor.rawValue) }
+        get { Color(hex: noMatchHex) ?? .gray }
+        set { noMatchHex = newValue.hex }
     }
     
-    func color(for match: Match) -> Color {
+    func color(for match: Code.Match) -> Color {
         switch match {
         case .exact: exactMatchColor
         case .inexact: inexactMatchColor
@@ -38,18 +41,5 @@ final class AppSettings {
         }
     }
     
-    init() {
-        let defaultWordLength = UserDefaults.standard.integer(forKey: Key.defaultWordLength.rawValue)
-        self.defaultWordLength = defaultWordLength > 0 ? defaultWordLength : CodeWordBreaker.defaultNumberOfLetters
-        self.exactMatchColor = UserDefaults.standard.string(forKey: Key.exactMatchColor.rawValue).flatMap(Color.init(hex:)) ?? .green
-        self.inexactMatchColor = UserDefaults.standard.string(forKey: Key.inexactMatchColor.rawValue).flatMap(Color.init(hex:)) ?? .yellow
-        self.noMatchColor = UserDefaults.standard.string(forKey: Key.noMatchColor.rawValue).flatMap(Color.init(hex:)) ?? .gray
-    }
-    
-    private enum Key: String {
-        case defaultWordLength
-        case exactMatchColor
-        case inexactMatchColor
-        case noMatchColor
-    }
+    init() {}
 }

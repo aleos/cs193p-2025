@@ -8,10 +8,13 @@
 import SwiftUI
 
 struct ElapsedTime: View {
+    // MARK: Data In
     let startTime: Date?
     let endTime: Date?
     let elapsedTime: TimeInterval
     var isShowPause = false
+    
+    // MARK: - Body
     
     var format: SystemFormatStyle.DateOffset {
         let date =

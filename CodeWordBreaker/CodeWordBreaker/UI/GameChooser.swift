@@ -5,63 +5,45 @@
 //  Created by Alexander Ostrovsky on 30/3/2026.
 //
 
+import SwiftData
 import SwiftUI
 
 struct GameChooser: View {
-    // MARK: Data In
-    @Environment(\.words) var words
-    @Environment(\.settings) var settings
+    // MARK: Data Shared with Me
+    @Environment(\.modelContext) private var modelContext
+    @Query private var allSettings: [AppSettings]
     
     // MARK: Data Owned by Me
-    @State private var games: [CodeWordBreaker] = .samples
     @State private var isSettingsPresented: Bool = false
     @State private var selectedGame: CodeWordBreaker?
+    @State private var search: String = ""
+    @State private var filterOption: GameList.FilterOption = .all
     
-    private var sortedGames: [CodeWordBreaker] {
-        games.sorted(using: KeyPathComparator(\.lastAttemptedAt, order: .reverse))
-    }
+    // MARK: - Body
     
     var body: some View {
         NavigationSplitView {
-            List(selection: $selectedGame) {
-                ForEach(sortedGames) { game in
-                    NavigationLink(value: game) {
-                        GameSummary(game: game)
-                            .allowsHitTesting(false)
-                    }
-                    .swipeActions(edge: .leading) {
-                        NavigationLink(value: game.masterCode.word) {
-                            Label("Cheat", systemImage: "eye")
-                                .tint(.purple)
+            Picker("Show", selection: $filterOption.animation(.default)) {
+                ForEach(GameList.FilterOption.allCases, id: \.self) { option in
+                    Text(option.title)
+                }
+            }
+            .pickerStyle(.segmented)
+            .padding(.horizontal)
+            GameList(selection: $selectedGame, codeContains: search, filterBy: filterOption)
+                .sheet(isPresented: $isSettingsPresented) {
+                    Settings(isPresented: $isSettingsPresented)
+                }
+                .toolbar {
+                    ToolbarItem(placement: .topBarLeading) {
+                        Button("Settings", systemImage: "gearshape") {
+                            isSettingsPresented = true
                         }
                     }
                 }
-                .onDelete { offsets in
-                    let toDelete = offsets.map { sortedGames[$0] }
-                    games.removeAll { toDelete.contains($0) }
-                }
-            }
-            .listStyle(.plain)
-            .navigationDestination(for: String.self) { word in
-                Text(word).font(.largeTitle)
-            }
-            .sheet(isPresented: $isSettingsPresented) {
-                Settings(isPresented: $isSettingsPresented)
-            }
-            .toolbar {
-                ToolbarItem(placement: .primaryAction) {
-                    if words.count == 0 {
-                        ProgressView()
-                    } else {
-                        newGame
-                    }
-                }
-                ToolbarItem(placement: .topBarLeading) {
-                    Button("Settings", systemImage: "gearshape") {
-                        isSettingsPresented = true
-                    }
-                }
-            }
+                .navigationTitle("Code Word Breaker")
+                .searchable(text: $search)
+                .animation(.easeOut, value: search)
         } detail: {
             if let selectedGame {
                 CodeWordBreakerView(game: selectedGame)
@@ -69,52 +51,15 @@ struct GameChooser: View {
                 Text("Choose a game")
             }
         }
-        .onChange(of: words.count) { oldValue, newValue in
-            guard oldValue == 0, newValue > 0 else { return }
-            initializeMasterCodes()
-        }
+        .environment(\.settings, allSettings.first ?? AppSettings.shared)
         .onAppear {
-            guard words.count > 0 else { return }
-            initializeMasterCodes()
-        }
-    }
-    
-    private var newGame: some View {
-        Menu("New game", systemImage: "plus") {
-            ForEach(3...6, id: \.self) { numberOfLetters in
-                Button("^[\(numberOfLetters) letters](inflect: true)") {
-                    settings.defaultWordLength = numberOfLetters
-                    createNewGame()
-                }
+            if allSettings.isEmpty {
+                modelContext.insert(AppSettings.shared)
             }
-        } primaryAction: {
-            createNewGame()
         }
-    }
-    
-    private func createNewGame() {
-        let game = CodeWordBreaker()
-        initializeMasterCode(for: game)
-        withAnimation {
-            games.insert(game, at: 0)
-        }
-        selectedGame = game
-    }
-    
-    private func initializeMasterCodes() {
-        games.forEach(initializeMasterCode)
-    }
-    
-    private func initializeMasterCode(for game: CodeWordBreaker) {
-        guard game.masterCode.hasMissingPegs else { return } // The master code has already been set
-        guard let word = words.random(length: settings.defaultWordLength) else {
-            assertionFailure("Can't set master code: no words")
-            return
-        }
-        game.restart(masterWord: word)
     }
 }
 
-#Preview {
+#Preview(traits: .swiftData) {
     GameChooser()
 }

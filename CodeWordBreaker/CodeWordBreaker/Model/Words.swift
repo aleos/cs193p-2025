@@ -11,6 +11,7 @@ extension EnvironmentValues {
     @Entry var words = Words.shared
 }
 
+@MainActor
 @Observable
 final class Words {
     private var words = Dictionary<Int, Set<String>>()
@@ -20,21 +21,25 @@ final class Words {
 
     private init(from url: URL? = nil) {
         Task {
-            var _words = [Int:Set<String>]()
-            if let url {
-                do {
-                    for try await word in url.lines {
-                        _words[word.count, default: Set<String>()].insert(word.uppercased())
-                    }
-                } catch {
-                    print("Words could not load words from \(url): \(error)")
-                }
-            }
-            words = _words
+            words = await load(from: url)
             if count > 0 {
                 print("Words loaded \(count) words from \(url?.absoluteString ?? "nil")")
             }
         }
+    }
+    
+    private func load(from url: URL?) async -> [Int: Set<String>] {
+        var _words = [Int:Set<String>]()
+        if let url {
+            do {
+                for try await word in url.lines {
+                    _words[word.count, default: Set<String>()].insert(word.lowercased())
+                }
+            } catch {
+                print("Words could not load words from \(url): \(error)")
+            }
+        }
+        return _words
     }
     
     var count: Int {
@@ -42,7 +47,7 @@ final class Words {
     }
     
     func contains(_ word: String) -> Bool {
-        words[word.count]?.contains(word.uppercased()) == true
+        words[word.count]?.contains(word.lowercased()) == true
     }
 
     func random(length: Int) -> String? {

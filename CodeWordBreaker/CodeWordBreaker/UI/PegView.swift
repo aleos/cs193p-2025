@@ -14,16 +14,16 @@ struct PegView: View {
     // MARK: - Body
     
     var body: some View {
-        Text(peg)
-            .font(.system(size: 120))
-            .minimumScaleFactor(9/120)
+        Text(peg.uppercased())
+            .flexibleSystemFont()
+            .scaledToFit()
             .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 
 #Preview {
     VStack {
-        PegView(peg: "A")
+        PegView(peg: "a")
         PegView(peg: Peg.missing)
     }
     .padding()

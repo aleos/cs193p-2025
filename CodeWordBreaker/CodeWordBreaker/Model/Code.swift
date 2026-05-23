@@ -6,10 +6,20 @@
 //
 
 import Foundation
+import SwiftData
 
-struct Code: Hashable {
-    var kind: Kind
-    var pegs: [Peg]
+@Model
+final class Code {
+    var _kind: String
+    var kind: Kind {
+        get { .init(rawValue: _kind) }
+        set { _kind = newValue.rawValue }
+    }
+    var pegs: [Peg] {
+        get { word.map(Peg.init) }
+        set { word = newValue.joined().lowercased() }
+    }
+    var timestamp = Date.now
     
     enum Kind: Hashable {
         case master(isHidden: Bool)
@@ -18,21 +28,27 @@ struct Code: Hashable {
         case unknown
     }
     
+    enum Match: String, CaseIterable {
+        case nomatch, inexact, exact
+    }
+    
     var hasMissingPegs: Bool { pegs.contains { $0 == Peg.missing } }
     
-    var word: String {
-        get { pegs.joined() }
-        set {
-            pegs = newValue.uppercased().map(Peg.init)
-            print("New word is \(word.isEmpty ? "missing" : newValue)")
-        }
+    var word: String
+    
+    init(kind: Kind, word: String) {
+        self._kind = kind.rawValue
+        self.word = word.lowercased()
     }
     
-    init(kind: Kind, numberOfPegs: Int) {
-        self.kind = kind
-        self.pegs = Array(repeating: Peg.missing, count: numberOfPegs)
+    convenience init(kind: Kind, pegs: [Peg] = Array<Peg>(repeating: .missing, count: 5)) {
+        self.init(kind: kind, word: pegs.joined())
     }
     
+    convenience init(kind: Kind, numberOfPegs: Int) {
+        self.init(kind: kind, word: String(repeating: Peg.missing, count: numberOfPegs))
+    }
+        
     var isHidden: Bool {
         switch kind {
         case .master(let isHidden): isHidden
@@ -40,7 +56,7 @@ struct Code: Hashable {
         }
     }
     
-    mutating func reset() {
+    func reset() {
         pegs = Array(repeating: Peg.missing, count: pegs.count)
     }
     
@@ -74,3 +90,41 @@ struct Code: Hashable {
         }
     }
 }
+
+extension Code.Kind: RawRepresentable {
+    private static let separator: String = ":"
+    private static let listSeparator: String = ","
+    
+    var rawValue: String {
+        switch self {
+        case .master(let isHidden): "master" + Self.separator + "\(isHidden)"
+        case .guess: "guess"
+        case .attempt(let matches): "attempt" + Self.separator + matches.map(\.rawValue).joined(separator: Self.listSeparator)
+        case .unknown: "unknown"
+        }
+    }
+    
+    init(rawValue: String) {
+        let parts = rawValue.split(separator: Self.separator, maxSplits: 1)
+        switch parts.first.map(String.init) {
+        case "master":
+            self = .master(isHidden: parts.last.map(String.init).map(Bool.init) != false)
+        case "guess":
+            self = .guess
+        case "attempt":
+            let tokens = parts.last?.split(separator: Self.listSeparator)
+            let matches = tokens?.compactMap { Code.Match(rawValue: String($0)) } ?? []
+            self = .attempt(matches)
+        default:
+            self = .unknown
+        }
+    }
+}
+
+extension Code.Match: Comparable {
+    static func < (lhs: Self, rhs: Self) -> Bool {
+        let order = allCases
+        return order.firstIndex(of: lhs)! < order.firstIndex(of: rhs)!
+    }
+}
+

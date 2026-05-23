@@ -6,33 +6,31 @@
 //
 
 import Foundation
+import SwiftData
 
-typealias Peg = String
-
-extension Peg {
-    static let missing = ""
-}
-
-@Observable
+@Model
 final class CodeWordBreaker {
     static let defaultNumberOfLetters: Int = 5
     
-    var masterCode: Code = .init(kind: .master(isHidden: true), numberOfPegs: defaultNumberOfLetters)
-    var guess: Code = .init(kind: .guess, numberOfPegs: defaultNumberOfLetters)
-    var attempts: [Code] = []
-    private(set) var startTime: Date?
+    @Relationship(deleteRule: .cascade) var masterCode = Code(kind: .master(isHidden: true), numberOfPegs: defaultNumberOfLetters)
+    @Relationship(deleteRule: .cascade) var guess = Code(kind: .guess, numberOfPegs: defaultNumberOfLetters)
+    @Relationship(deleteRule: .cascade) var _attempts: [Code] = []
+    @Transient private(set) var startTime: Date?
     private(set) var elapsedTime: TimeInterval = 0
     private(set) var endTime: Date?
     private(set) var lastAttemptedAt: Date?
+    private(set) var created = Date.now
+    var isOver: Bool = false
     
     var canAttemptGuess: Bool { !guess.pegs.isEmpty && !guess.hasMissingPegs && !attempts.contains { $0.pegs == guess.pegs } }
     
+    var attempts: [Code] {
+        get { _attempts.sorted { $0.timestamp > $1.timestamp } }
+        set { _attempts = newValue }
+    }
+        
     init(word: String? = nil) {
         restart(masterWord: word)
-    }
-    
-    var isOver: Bool {
-        attempts.last?.pegs == masterCode.pegs
     }
     
     func restart(numberOfPegs: Int? = nil, masterWord: String? = nil) {
@@ -46,17 +44,18 @@ final class CodeWordBreaker {
         guess = Code(kind: .guess, numberOfPegs: numberOfPegs)
         attempts.removeAll()
         endTime = nil
+        isOver = false
     }
     
     func attemptGuess() {
         guard canAttemptGuess else { return }
-        var attempt = guess
-        attempt.kind = .attempt(guess.match(against: masterCode))
+        let attempt = Code(kind: .attempt(guess.match(against: masterCode)), pegs: guess.pegs)
         attempts.append(attempt)
         lastAttemptedAt = .now
-        print("Attempt: \(attempt)")
+        print("Attempt: \(attempt.word)")
         guess.reset()
-        if isOver {
+        if attempts.first?.pegs == masterCode.pegs {
+            isOver = true
             masterCode.kind = .master(isHidden: false)
             pause()
             endTime = .now
@@ -68,15 +67,23 @@ final class CodeWordBreaker {
         guess.pegs[index] = peg
     }
     
-    func bestResult(for peg: Peg) -> Match? {
+    func bestResult(for peg: Peg) -> Code.Match? {
         let pegMatches = attempts.flatMap { attempt in
             zip(attempt.pegs, attempt.matches ?? []).map { (peg: $0, match: $1) }
         }
         return pegMatches.filter { $0.peg == peg }.map(\.match).max()
     }
     
+    func updateElapsedTime() {
+        pause()
+        resume()
+    }
+    
     func resume() {
-        guard endTime == nil else { return }
+        guard !isOver else { return }
+        // Nudge a persisted property so SwiftData triggers a UI update
+        // (@Transient startTime changes aren't observed)
+        elapsedTime += 0.00001
         startTime = .now
     }
     
@@ -84,16 +91,6 @@ final class CodeWordBreaker {
         guard let startTime else { return }
         self.startTime = nil
         elapsedTime += Date.now.timeIntervalSince(startTime)
-    }
-}
-
-extension CodeWordBreaker: Identifiable, Hashable {
-    static func == (lhs: CodeWordBreaker, rhs: CodeWordBreaker) -> Bool {
-        lhs.id == rhs.id
-    }
-    
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
     }
 }
 
@@ -108,15 +105,16 @@ extension Array where Element == CodeWordBreaker {
         let swift = CodeWordBreaker(word: "swift")
         makeAttempts(["house", "plant", "water", "beach", "swift"], in: swift)
         let quick = CodeWordBreaker(word: "quick")
+        let dirty = CodeWordBreaker(word: "dirty")
         let sweet = CodeWordBreaker(word: "sweet")
         makeAttempts(["bread", "light", "grass", "chair", "dream", "flame", "truck", "shelf", "paint", "guard", "clock", "storm", "train", "smile"], in: sweet)
         
-        return [apple, swift, quick, sweet]
+        return [apple, swift, quick, dirty, sweet]
     }
     
     private static func makeAttempts(_ words: [String], in game: CodeWordBreaker) {
         for word in words {
-            var guess = Code(kind: .guess, numberOfPegs: CodeWordBreaker.defaultNumberOfLetters)
+            let guess = Code(kind: .guess, numberOfPegs: CodeWordBreaker.defaultNumberOfLetters)
             guess.word = word
             game.guess = guess
             game.attemptGuess()

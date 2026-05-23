@@ -27,10 +27,10 @@ struct CodeWordBreakerView: View {
                     CodeView(code: game.guess, selection: $selection)
                         .padding(.horizontal)
                         .transaction { $0.animation = nil }
-                        .modifier(ShakeEffect(shakes: invalidGuessCount))
+                        .shake(shakes: invalidGuessCount)
                 }
-                ForEach(game.attempts.indices.reversed(), id: \.self) { index in
-                    CodeView(code: game.attempts[index])
+                ForEach(game.attempts) { attempt in
+                    CodeView(code: attempt)
                         .transition(.attempt(game.isOver))
                 }
                 .padding(.horizontal)
@@ -41,7 +41,7 @@ struct CodeWordBreakerView: View {
                     .padding()
                     .background {
                         Rectangle()
-                            .clipShape(.rect(cornerRadius: 16))
+                            .clipShape(.rect(cornerRadius: Layout.keyboardCornerRadius))
                             .foregroundStyle(.background)
                             .ignoresSafeArea(.all, edges: .bottom)
                     }
@@ -49,7 +49,6 @@ struct CodeWordBreakerView: View {
             }
         }
         .padding(.top)
-        .trackElapsedTime(in: game)
         .toolbar {
             ToolbarItem {
                 ElapsedTime(startTime: game.startTime, endTime: game.endTime, elapsedTime: game.elapsedTime)
@@ -58,6 +57,7 @@ struct CodeWordBreakerView: View {
                     .fixedSize(horizontal: true, vertical: false)
             }
         }
+        .trackElapsedTime(in: game)
         .navigationBarTitleDisplayMode(.inline)
     }
     
@@ -85,7 +85,11 @@ struct CodeWordBreakerView: View {
     }
 }
 
-#Preview {
+private enum Layout {
+    static let keyboardCornerRadius: CGFloat = 16
+}
+
+#Preview(traits: .swiftData) {
     @Previewable let game: CodeWordBreaker = .sample
     NavigationStack {
         CodeWordBreakerView(game: game)
